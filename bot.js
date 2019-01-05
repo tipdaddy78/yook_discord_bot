@@ -16,6 +16,7 @@ bot.on('ready', (evt) => {
 });
 
 var mod_list = ["ch1pset", "tipdaddy"];
+var bIsAwake = false;
 bot.on('message', msg => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `!`
@@ -32,16 +33,36 @@ bot.on('message', msg => {
                 if(mod_list.includes(msg.author.username))
                     mod_list.push(args[1]);
             break;
+
             case 'removemod':
                 if(mod_list.includes(msg.author.username))
                     mod_list.splice(mod_list.indexOf(args[1]), 1);
             break;
+
             case 'showmods':
                 msg.channel.send(mod_list);
             break;
+
             case 'me':
                 msg.channel.send(msg.author.username);
-         }
-     }
+            break;
+
+            case 'wakeup':
+                bIsAwake = true;
+                msg.reply('I\'m awake!');
+            break;
+
+            case 'shutup':
+                bIsAwake = false;
+                msg.reply('DON\'T TELL ME WHAT TO DO!')
+            break;
+        }
+    }
+
+    //INEPT_bot insult replies. INEPT_bot will take input strings and return
+    //some output that sounds similar
+    if (bIsAwake){
+
+    }
 });
 bot.login(auth.token)
