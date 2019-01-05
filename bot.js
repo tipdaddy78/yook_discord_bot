@@ -30,12 +30,12 @@ bot.on('message', msg => {
             break;
             // Just add any case commands if you want to..
             case 'addmod':
-                if(mod_list.includes(msg.author.username))
+                if(msg.member.roles.find("name", "Mods"))
                     mod_list.push(args[1]);
             break;
 
             case 'removemod':
-                if(mod_list.includes(msg.author.username))
+                if(msg.member.roles.find("name", "Mods"))
                     mod_list.splice(mod_list.indexOf(args[1]), 1);
             break;
 
