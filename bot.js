@@ -15,39 +15,96 @@ bot.on('ready', (evt) => {
     logger.info('Logged in as: ' + bot.user);
 });
 
-function isMod(msg) {
-	return msg.member.roles.find("name", "Mods");
+//Functions for use in command procedures
+//
+//Sends message to current channel
+function sendMessage(msg_obj, content) {
+    msg_obj.channel.send(content);
 }
 
-var command_list = ["!ping", "!me", "!wakeup", "!shutup"];
+//Returns username of current user
+function getUsername(msg) {
+    return msg.author.username;
+}
+
+//Finds and returns GuildMember of specified username
+function getMember(guild, username) {
+    return guild.members.find(m => m.displayName === username);
+}
+
+//Checks if member has "Mods" role
+function checkRole(member, role) {
+    return member.roles.find(r => r.name === role);
+}
+
+//Checks if user who sent command is a mod
+function isMod(msg) {
+	return checkRole(msg.member, "Mods");
+}
+
+//Checks if specified user in guild is a mod
+function isMod(msg, username) {
+    return checkRole(getMember(msg.guild, username), "Mods");
+}
+
+//Generates text to mention specified user in a message
+function mention(userid) {
+    var out = ' ';
+    out += '<';
+    out += '@';
+    out += userid;
+    out += '>';
+    return out;
+}
+
+var commands = ["ping", "me", "wakeup", "shutup", "checkmod"];
 var bIsAwake = false;
 bot.on('message', msg => {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `!`
-    if (msg.content.substring(0, 1) == '!') {
+    if (msg.content[0] == '!') {
         var args = msg.content.substring(1).split(' ');
         var cmd = args[0];
-        switch(cmd) {
+        switch(commands.indexOf(cmd)) {
             // !ping
-            case 'ping':
-                msg.reply('Pong!');
+            case 0:
+                if(args.length > 1){
+                    var member = getMember(msg.guild, args[1]);
+                    if(member) {
+                        sendMessage(msg, 'Yo' + mention(member.user.id) + '!');
+                    }
+                    else {
+                        msg.reply('No user by that name in this channel!');
+                    }
+                }
+                else {
+                    msg.reply('Pong!');
+                }
             break;
-            case 'me':
-                msg.channel.send(msg.author.username);
+            case 1:
+                sendMessage(msg, getUsername(msg));
             break;
 
-            case 'wakeup':
+            case 2:
                 bIsAwake = true;
                 msg.reply('I\'m awake!');
             break;
 
-            case 'shutup':
+            case 3:
                 bIsAwake = false;
                 msg.reply('DON\'T TELL ME WHAT TO DO!')
             break;
+
+            case 4:
+                if(isMod(msg)) {
+                    msg.reply('You are a mod');
+                }
+                else {
+                    msg.reply('You are not a mod');
+                }
+            break;
         }
     }
-
     //INEPT_bot insult replies. INEPT_bot will take input strings and return
     //some output that sounds similar
     if (bIsAwake){
