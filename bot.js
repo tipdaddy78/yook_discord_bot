@@ -15,6 +15,10 @@ bot.on('ready', (evt) => {
     logger.info('Logged in as: ' + bot.user);
 });
 
+function isMod(msg) {
+	return msg.member.roles.find("name", "Mods");
+}
+
 var command_list = ["!ping", "!me", "!wakeup", "!shutup"];
 var bIsAwake = false;
 bot.on('message', msg => {
