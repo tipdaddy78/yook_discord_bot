@@ -15,7 +15,7 @@ bot.on('ready', (evt) => {
     logger.info('Logged in as: ' + bot.user);
 });
 
-var mod_list = ["ch1pset", "tipdaddy"];
+var command_list = ["!ping", "!me", "!wakeup", "!shutup"];
 var bIsAwake = false;
 bot.on('message', msg => {
     // Our bot needs to know if it will execute a command
@@ -28,21 +28,6 @@ bot.on('message', msg => {
             case 'ping':
                 msg.reply('Pong!');
             break;
-            // Just add any case commands if you want to..
-            case 'addmod':
-                if(msg.member.roles.find("name", "Mods"))
-                    mod_list.push(args[1]);
-            break;
-
-            case 'removemod':
-                if(msg.member.roles.find("name", "Mods"))
-                    mod_list.splice(mod_list.indexOf(args[1]), 1);
-            break;
-
-            case 'showmods':
-                msg.channel.send(mod_list);
-            break;
-
             case 'me':
                 msg.channel.send(msg.author.username);
             break;
