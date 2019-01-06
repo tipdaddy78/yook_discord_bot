@@ -37,11 +37,6 @@ function checkRole(member, role) {
     return member.roles.find(r => r.name === role);
 }
 
-//Checks if user who sent command is a mod
-function isMod(msg) {
-	return checkRole(msg.member, "Mods");
-}
-
 //Checks if specified user in guild is a mod
 function isMod(msg, username) {
     return checkRole(getMember(msg.guild, username), "Mods");
@@ -96,11 +91,26 @@ bot.on('message', msg => {
             break;
 
             case 4:
-                if(isMod(msg)) {
-                    msg.reply('You are a mod');
+                if(args.length > 1) {
+                    if(getMember(msg.guild, args[1])) {
+                        if(isMod(msg, args[1])) {
+                            sendMessage(msg, args[1] + ' is a mod.');
+                        }
+                        else {
+                            sendMessage(msg, args[1] + ' is not a mod.');
+                        }
+                    }
+                    else {
+                        msg.reply('No user by that name in this channel!');
+                    }
                 }
                 else {
-                    msg.reply('You are not a mod');
+                    if(isMod(msg, getUsername(msg))) {
+                        msg.reply('You are a mod');
+                    }
+                    else {
+                        msg.reply('You are not a mod');
+                    }
                 }
             break;
         }
