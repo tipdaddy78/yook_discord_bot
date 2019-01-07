@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const Bot = require('./bot.js');
 const Database = require('./database.js');
 var linksDB = require('./links.json');
 
@@ -31,8 +32,7 @@ module.exports = class Cmd {
         this.smtalk_reply = [
             "Baby don't hurt me!"
         ];
-        this.bIsAwake = false;
-        this.db = new Database(linksDB);
+        this.db = new Database('./links.json', linksDB);
     }
     //Sends a message through current channel
     sendMessage(content) {
@@ -127,11 +127,11 @@ module.exports = class Cmd {
             }
         }
     }
-    parseSmallTalk() {
+    parseSmallTalk(awake) {
         //INEPT_bot insult replies. INEPT_bot will take input strings and return
         //some output that sounds similar
         if (this.bIsAwake){
-            switch(this.smtalk_list.indexOf(this.content)) {
+            switch(this.smtalk_list.indexOf(this.content.substring(0))) {
                 case 0: this.reply(this.smtalk_reply[0]); break;
                 default: break;
             }
@@ -139,7 +139,7 @@ module.exports = class Cmd {
     }
 
     cmdPing(user){
-        if(user) {
+        if(user && this.isMod(this.username)) {
             if(this.getMember(user)) {
                 let userid = this.getUserId(user);
                 this.sendMessage('Yo' + this.mention(userid) + '!');
@@ -159,7 +159,7 @@ module.exports = class Cmd {
 
     cmdWakeUp() {
         if(this.isMod(this.username)) {
-            this.bIsAwake = true;
+            Bot.bIsAwake = true;
             this.reply('I\'m awake!');
         }
         else {
@@ -169,7 +169,7 @@ module.exports = class Cmd {
 
     cmdShutUp() {
         if(this.isMod(this.username)) {
-            this.bIsAwake = false;
+            Bot.bIsAwake = false;
             this.reply('DON\'T TELL ME WHAT TO DO!');
         }
         else {
@@ -198,7 +198,7 @@ module.exports = class Cmd {
     cmdHelp(cmd) {
         if(cmd) {
             switch(this.cmd_list.indexOf(cmd)) {
-                case 0: this.reply(' !ping [username/optional]'); break;
+                case 0: this.reply(' ping takes no arguments'); break;
                 case 1: this.reply(' me takes no arguments.'); break;
                 case 2: this.reply(' wakeup takes no arguments'); break;
                 case 3: this.reply(' shutup takes no arguments'); break;
@@ -216,22 +216,35 @@ module.exports = class Cmd {
     }
 
     cmdCommandList() {
-        let out;
-        for(c of this.cmd_list) {
-            out += ' ';
-            out += c;
-            out += ',';
+        if(this.isMod(this.username)) {
+            let out = '\n';
+            for(let c of this.cmd_list) {
+                if(c) {
+                    out += ' ';
+                    out += c;
+                    out += ',';
+                    out += '\n';
+                }
+            }
+            this.reply(out);
         }
-        this.reply(out);
+        else {
+            this.reply('You don\'t have permission to use this command, ask a mod!');
+        }
     }
 
     cmdAddLink(name, link) {
-        if(name && link) {
-            this.db.add(name, link);
-            this.reply('Link added!');
+        if(this.isMod(this.username)) {
+            if(name && link) {
+                this.db.add(name, link);
+                this.reply('Link added!');
+            }
+            else {
+                this.reply('Please provide both a name and link!');
+            }
         }
         else {
-            this.reply('Please provide both a name and link!');
+            this.reply('This command can only be used by mods!');
         }
     }
 
