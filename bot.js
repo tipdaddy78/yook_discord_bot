@@ -11,7 +11,6 @@ logger.add(new logger.transports.Console, {
 logger.level = 'debug';
 // Initialize Discord Bot
 const bot = new Discord.Client();
-var bIsAwake = false;
 
 bot.on('ready', (evt) => {
     logger.info('Connected');
@@ -22,6 +21,5 @@ bot.on('ready', (evt) => {
 bot.on('message', msg => {
     let cmd = new Cmd(msg);
     cmd.parseBang();
-    cmd.parseSmallTalk();
 });
 bot.login(auth.token)
