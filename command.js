@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const links = require('/links.xml');
 
 //Node.js export for use in other scripts
 //Cmd class contains functions that are crucial for bot commands
@@ -19,7 +20,8 @@ module.exports = class Cmd {
                             "shutup",
                             "checkmod",
                             "help",
-                            "commandlist"
+                            "commandlist",
+                            "addlink"
                         ];
         this.bIsAwake = false;
     }
@@ -94,6 +96,7 @@ module.exports = class Cmd {
                 //          @user !cmd [arg1] [arg2]... [argN]
                 case 5: this.cmdHelp(args[1]); break;
                 case 6: this.cmdCommandList(); break;
+                case 7: this.cmdAddLink(args[1], args[2]);
                 default: this.cmdInvalid(); break;
             }
         }
@@ -173,6 +176,7 @@ module.exports = class Cmd {
                 case 4: this.reply(' !checkmod [username/optional]'); break;
                 case 5: this.reply(' !help [command/required]'); break;
                 case 6: this.reply(' commandlist takes no arguments'); break;
+                case 7: this.reply(' !addlink [name/required] [link/required]'); break;
             }
         }
         else {
@@ -182,6 +186,16 @@ module.exports = class Cmd {
 
     cmdCommandList() {
         this.reply(this.cmd_list.toString());
+    }
+
+    cmdAddLink(name, link) {
+        if(name && link) {
+
+            this.reply('Link added!');
+        }
+        else {
+            this.reply('Please provide both a name and link!');
+        }
     }
 
     cmdInvalid() {
