@@ -22,7 +22,9 @@ module.exports = class Cmd {
             "help",
             "commandlist",
             "addlink",
-            "getlink"
+            "getlink",
+            "deletelink",
+            "deletelast"
         ];
         this.db = new Database('./links.json', linksDB);
     }
@@ -101,6 +103,15 @@ module.exports = class Cmd {
                 //Example:  !getlink meme
                 //          @user, https://dank.meme
                 case 6: this.cmdGetLink(args[1]); break;
+                //Deletelink command deletes the link with specified name in the
+                //links.json file
+                //Example:  !deletelink meme
+                //          @user, Successfully deleted link.
+                case 7: this.cmdDeleteLink(args[1]); break;
+                //Deletelast command deletes last link in the links.json file
+                //Example:  !deletelast
+                //          @user, Successfully deleted last link.
+                case 8: this.cmdDeleteLast(); break;
                 //Invalid command will be used if user tries to input any
                 //command that isn't in the command list
                 //Example:  !potato
@@ -157,7 +168,9 @@ module.exports = class Cmd {
                 case 4: this.reply(' commandlist takes no arguments'); break;
                 case 5: this.reply(' !addlink [name/required] [link/required]'); break;
                 case 6: this.reply(' !getlink [name/required]'); break;
-                default: this.reply(' I don\'t recognize that command, sorry, can\'t help!');
+                case 7: this.reply(' !deletelink [name/required]'); break;
+                case 8: this.reply(' deletelast takes no arguments'); break;
+                default: this.reply(' I don\'t recognize that command, sorry, can\'t help!'); break;
             }
         }
         else {
@@ -210,6 +223,41 @@ module.exports = class Cmd {
         }
         else {
             this.reply('Please enter the name of the link, must have no spaces');
+        }
+    }
+
+    cmdDeleteLink(name) {
+        if(this.isMod(this.username)) {
+            if(name) {
+                let d = this.db.delete(name);
+                if(d) {
+                    this.reply('Successfully deleted link.');
+                }
+                else {
+                    this.reply('No link with that name in database.');
+                }
+            }
+            else {
+                this.reply('Please enter the name of the link, must have no spaces');
+            }
+        }
+        else {
+            this.reply('This command can only be used by mods!');
+        }
+    }
+
+    cmdDeleteLast() {
+        if(this.isMod(this.username)) {
+            let d = this.db.deleteLast();
+            if(d) {
+                this.reply('Successfully deleted last link.');
+            }
+            else {
+                this.reply('There are no links to delete.');
+            }
+        }
+        else {
+            this.reply('This command can only be used by mods!');
         }
     }
 
