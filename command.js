@@ -96,7 +96,7 @@ module.exports = class Cmd {
                 //          @user !cmd [arg1] [arg2]... [argN]
                 case 5: this.cmdHelp(args[1]); break;
                 case 6: this.cmdCommandList(); break;
-                case 7: this.cmdAddLink(args[1], args[2]);
+                case 7: this.cmdAddLink(args[1], args[2]); break;
                 default: this.cmdInvalid(); break;
             }
         }
