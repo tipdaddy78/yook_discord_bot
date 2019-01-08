@@ -7,7 +7,7 @@ module.exports = class Database {
     }
     add(name, data) {
         this.db[name] = data;
-        fs.writeFile(this.filepath, JSON.stringify(this.db), (err) => {
+        fs.writeFile(this.filepath, JSON.stringify(this.db, null, 2), (err) => {
             if(err) throw err;
         });
         return true;
@@ -19,6 +19,9 @@ module.exports = class Database {
                 return true;
             }
         }
+        fs.writeFile(this.filepath, JSON.stringify(this.db, null, 2), (err) => {
+            if(err) throw err;
+        });
         return false;
     }
     deleteLast() {
@@ -27,6 +30,9 @@ module.exports = class Database {
             last = o;
         }
         delete this.db[last];
+        fs.writeFile(this.filepath, JSON.stringify(this.db, null, 2), (err) => {
+            if(err) throw err;
+        });
         return last;
     }
     get(name) {

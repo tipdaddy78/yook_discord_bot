@@ -18,19 +18,12 @@ module.exports = class Cmd {
         this.cmd_list = [
             "ping",
             "me",
-            "wakeup",
-            "shutup",
-            "checkmod",
             "help",
-            "commandlist",
+            "commands",
             "addlink",
-            "getlink"
-        ];
-        this.smtalk_list =  [
-            "What is love"
-        ];
-        this.smtalk_reply = [
-            "Baby don't hurt me!"
+            "getlink",
+            "deletelink",
+            "deletelast"
         ];
         this.db = new Database('./links.json', linksDB);
     }
@@ -83,57 +76,41 @@ module.exports = class Cmd {
                 //Example:  !me
                 //          yourname
                 case 1: this.cmdMe(); break;
-                //Wakeup command will change bIsAwake value to true and send a confirmation
-                //message back to current user if a mod, otherwise it won't change bIsAwake
-                //Example:  !wakeup
-                //          I'm awake!
-                case 2: this.cmdWakeUp(); break;
-                //Shutup command will change bIsAwake value to false and send a confirmation
-                //message back to current user if a mod, otherwise it won't change bIsAwake
-                //Example:  !shutup
-                //          DON'T TELL ME WHAT TO DO!
-                case 3: this.cmdShutUp(); break;
-                //Checkmod command will check if specified user has "Mods" role. If no user
-                //is specified, it will check current user
-                //Example:  !checkmod user
-                //          user is not a mod.
-                case 4: this.cmdCheckMod(args[1]); break;
                 //Help command will provide information for specified commands.
                 //Example:  !help
                 //          @user !help [cmd]
                 //          !help cmd
                 //          @user !cmd [arg1] [arg2]... [argN]
-                case 5: this.cmdHelp(args[1]); break;
+                case 2: this.cmdHelp(args[1]); break;
                 //Commandlist will send a reply to current user with the full list
                 //of available commands
                 //Example:  !commandlist
                 //          @user, ping, me, wakeup, shutup, checkmod, help
-                case 6: this.cmdCommandList(); break;
+                case 3: this.cmdCommands(); break;
                 //Addlink command will add a new link to a list of links associated
                 //with a name in an xml doc
                 //Example:  !addlink meme https://dank.meme
                 //          Your link has been added!
-                case 7: this.cmdAddLink(args[1], args[2]); break;
+                case 4: this.cmdAddLink(args[1], args[2]); break;
                 //Getlink command will reply to user the exact link with the specified
                 //key/name provided in argument list
                 //Example:  !getlink meme
                 //          @user, https://dank.meme
-                case 8: this.cmdGetLink(args[1]); break;
+                case 5: this.cmdGetLink(args[1]); break;
+                //Deletelink command deletes the link with specified name in the
+                //links.json file
+                //Example:  !deletelink meme
+                //          @user, Successfully deleted link.
+                case 6: this.cmdDeleteLink(args[1]); break;
+                //Deletelast command deletes last link in the links.json file
+                //Example:  !deletelast
+                //          @user, Successfully deleted last link.
+                case 7: this.cmdDeleteLast(); break;
                 //Invalid command will be used if user tries to input any
                 //command that isn't in the command list
                 //Example:  !potato
                 //          I don't know that one!
                 default: this.cmdInvalid(); break;
-            }
-        }
-    }
-    parseSmallTalk(awake) {
-        //INEPT_bot insult replies. INEPT_bot will take input strings and return
-        //some output that sounds similar
-        if (this.bIsAwake){
-            switch(this.smtalk_list.indexOf(this.content.substring(0))) {
-                case 0: this.reply(this.smtalk_reply[0]); break;
-                default: break;
             }
         }
     }
@@ -157,57 +134,18 @@ module.exports = class Cmd {
         this.sendMessage(this.username);
     }
 
-    cmdWakeUp() {
-        if(this.isMod(this.username)) {
-            Bot.bIsAwake = true;
-            this.reply('I\'m awake!');
-        }
-        else {
-            this.reply('YOU HAVE NO AUTHORITAH!');
-        }
-    }
-
-    cmdShutUp() {
-        if(this.isMod(this.username)) {
-            Bot.bIsAwake = false;
-            this.reply('DON\'T TELL ME WHAT TO DO!');
-        }
-        else {
-            this.reply('YOU SHUTUP PLEB!');
-        }
-    }
-
-    cmdCheckMod(user) {
-        if(user) {
-            if(this.getMember(user)) {
-                this.sendMessage(user
-                    + (this.isMod(user)? ' is' : ' is not')
-                    + ' a mod');
-            }
-            else {
-                this.reply('No user by that name in this server!');
-            }
-        }
-        else {
-            this.reply('You '
-                + (this.isMod(this.username)? 'are' : 'are not')
-                + ' a mod');
-        }
-    }
-
     cmdHelp(cmd) {
         if(cmd) {
             switch(this.cmd_list.indexOf(cmd)) {
                 case 0: this.reply(' ping takes no arguments'); break;
-                case 1: this.reply(' me takes no arguments.'); break;
-                case 2: this.reply(' wakeup takes no arguments'); break;
-                case 3: this.reply(' shutup takes no arguments'); break;
-                case 4: this.reply(' !checkmod [username/optional]'); break;
-                case 5: this.reply(' !help [command/required]'); break;
-                case 6: this.reply(' commandlist takes no arguments'); break;
-                case 7: this.reply(' !addlink [name/required] [link/required]'); break;
-                case 8: this.reply(' !getlink [name/required]'); break;
-                default: this.reply(' I don\'t recognize that command, sorry, can\'t help!');
+                case 1: this.reply(' me takes no arguments'); break;
+                case 2: this.reply(' !help <command>'); break;
+                case 3: this.reply(' commands takes no arguments'); break;
+                case 4: this.reply(' !addlink <name> <url>'); break;
+                case 5: this.reply(' !getlink <name>'); break;
+                case 6: this.reply(' !deletelink <name>'); break;
+                case 7: this.reply(' deletelast takes no arguments'); break;
+                default: this.reply(' no help for non-existant commands.'); break;
             }
         }
         else {
@@ -215,7 +153,7 @@ module.exports = class Cmd {
         }
     }
 
-    cmdCommandList() {
+    cmdCommands() {
         if(this.isMod(this.username)) {
             let out = '\n';
             for(let c of this.cmd_list) {
@@ -260,6 +198,41 @@ module.exports = class Cmd {
         }
         else {
             this.reply('Please enter the name of the link, must have no spaces');
+        }
+    }
+
+    cmdDeleteLink(name) {
+        if(this.isMod(this.username)) {
+            if(name) {
+                let d = this.db.delete(name);
+                if(d) {
+                    this.reply('Successfully deleted link.');
+                }
+                else {
+                    this.reply('No link with that name in database.');
+                }
+            }
+            else {
+                this.reply('Please enter the name of the link, must have no spaces');
+            }
+        }
+        else {
+            this.reply('This command can only be used by mods!');
+        }
+    }
+
+    cmdDeleteLast() {
+        if(this.isMod(this.username)) {
+            let d = this.db.deleteLast();
+            if(d) {
+                this.reply('Successfully deleted last link.');
+            }
+            else {
+                this.reply('There are no links to delete.');
+            }
+        }
+        else {
+            this.reply('This command can only be used by mods!');
         }
     }
 
