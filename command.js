@@ -16,8 +16,6 @@ module.exports = class Cmd {
         this.guild = message.guild;
         this.channel = message.channel;
         this.cmd_list = [
-            "ping",
-            "me",
             "help",
             "commands",
             "addlink",
@@ -64,48 +62,36 @@ module.exports = class Cmd {
         if(this.content[0] == '!') {
             let args = this.content.substring(1).split(' ');
             switch(this.cmd_list.indexOf(args[0])) {
-                //Ping will mention specified user with "Yo", if no user is specified
-                //ping will simply mention current user with "Pong!"
-                //Example:  !ping
-                //          @user, Pong!
-                //          !ping user
-                //          Yo @user
-                case 0: this.cmdPing(args[1]); break;
-                //Me command will just send a message to current channel with current user's
-                //name
-                //Example:  !me
-                //          yourname
-                case 1: this.cmdMe(); break;
                 //Help command will provide information for specified commands.
                 //Example:  !help
                 //          @user !help [cmd]
                 //          !help cmd
                 //          @user !cmd [arg1] [arg2]... [argN]
-                case 2: this.cmdHelp(args[1]); break;
+                case 0: this.cmdHelp(args[1]); break;
                 //Commandlist will send a reply to current user with the full list
                 //of available commands
                 //Example:  !commandlist
                 //          @user, ping, me, wakeup, shutup, checkmod, help
-                case 3: this.cmdCommands(); break;
+                case 1: this.cmdCommands(); break;
                 //Addlink command will add a new link to a list of links associated
                 //with a name in an xml doc
                 //Example:  !addlink meme https://dank.meme
                 //          Your link has been added!
-                case 4: this.cmdAddLink(args[1], args[2]); break;
+                case 2: this.cmdAddLink(args[1], args[2]); break;
                 //Getlink command will reply to user the exact link with the specified
                 //key/name provided in argument list
                 //Example:  !getlink meme
                 //          @user, https://dank.meme
-                case 5: this.cmdGetLink(args[1]); break;
+                case 3: this.cmdGetLink(args[1]); break;
                 //Deletelink command deletes the link with specified name in the
                 //links.json file
                 //Example:  !deletelink meme
                 //          @user, Successfully deleted link.
-                case 6: this.cmdDeleteLink(args[1]); break;
+                case 4: this.cmdDeleteLink(args[1]); break;
                 //Deletelast command deletes last link in the links.json file
                 //Example:  !deletelast
                 //          @user, Successfully deleted last link.
-                case 7: this.cmdDeleteLast(); break;
+                case 5: this.cmdDeleteLast(); break;
                 //Invalid command will be used if user tries to input any
                 //command that isn't in the command list
                 //Example:  !potato
@@ -115,36 +101,15 @@ module.exports = class Cmd {
         }
     }
 
-    cmdPing(user){
-        if(user && this.isMod(this.username)) {
-            if(this.getMember(user)) {
-                let userid = this.getUserId(user);
-                this.sendMessage('Yo' + this.mention(userid) + '!');
-            }
-            else {
-                this.reply('No user by that name in this server!');
-            }
-        }
-        else {
-            this.reply('Pong!');
-        }
-    }
-
-    cmdMe() {
-        this.sendMessage(this.username);
-    }
-
     cmdHelp(cmd) {
         if(cmd) {
             switch(this.cmd_list.indexOf(cmd)) {
-                case 0: this.reply(' ping takes no arguments'); break;
-                case 1: this.reply(' me takes no arguments'); break;
-                case 2: this.reply(' !help <command>'); break;
-                case 3: this.reply(' commands takes no arguments'); break;
-                case 4: this.reply(' !addlink <name> <url>'); break;
-                case 5: this.reply(' !getlink <name>'); break;
-                case 6: this.reply(' !deletelink <name>'); break;
-                case 7: this.reply(' deletelast takes no arguments'); break;
+                case 0: this.reply(' !help <command>'); break;
+                case 1: this.reply(' commands takes no arguments'); break;
+                case 2: this.reply(' !addlink <name> <url>'); break;
+                case 3: this.reply(' !getlink <name>'); break;
+                case 4: this.reply(' !deletelink <name>'); break;
+                case 5: this.reply(' deletelast takes no arguments'); break;
                 default: this.reply(' no help for non-existant commands.'); break;
             }
         }
@@ -167,7 +132,7 @@ module.exports = class Cmd {
             this.reply(out);
         }
         else {
-            this.reply('You don\'t have permission to use this command, ask a mod!');
+            this.reply('You don\'t have permission to use this command');
         }
     }
 
@@ -197,7 +162,7 @@ module.exports = class Cmd {
             }
         }
         else {
-            this.reply('Please enter the name of the link, must have no spaces');
+            this.reply('Please enter the name of the link to get');
         }
     }
 
@@ -213,7 +178,7 @@ module.exports = class Cmd {
                 }
             }
             else {
-                this.reply('Please enter the name of the link, must have no spaces');
+                this.reply('Please enter the name of the link to delete');
             }
         }
         else {
