@@ -9,6 +9,7 @@ module.exports = class Cmd {
     //All classes must have a constructor, a default will be used if not called
     //exclusively
     constructor(message){
+        this.msg = message;
         this.content = message.content;
         this.username = message.author.username;
         this.member = message.member;
@@ -137,14 +138,14 @@ module.exports = class Cmd {
         if(cmd) {
             switch(this.cmd_list.indexOf(cmd)) {
                 case 0: this.reply(' ping takes no arguments'); break;
-                case 1: this.reply(' me takes no arguments.'); break;
-                case 2: this.reply(' !help [command/required]'); break;
+                case 1: this.reply(' me takes no arguments'); break;
+                case 2: this.reply(' !help <command>'); break;
                 case 3: this.reply(' commands takes no arguments'); break;
-                case 4: this.reply(' !addlink [name/required] [link/required]'); break;
-                case 5: this.reply(' !getlink [name/required]'); break;
-                case 6: this.reply(' !deletelink [name/required]'); break;
+                case 4: this.reply(' !addlink <name> <url>'); break;
+                case 5: this.reply(' !getlink <name>'); break;
+                case 6: this.reply(' !deletelink <name>'); break;
                 case 7: this.reply(' deletelast takes no arguments'); break;
-                default: this.reply(' I don\'t recognize that command, sorry, can\'t help!'); break;
+                default: this.reply(' no help for non-existant commands.'); break;
             }
         }
         else {
