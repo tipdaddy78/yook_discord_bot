@@ -1,0 +1,42 @@
+{
+    "invalid":{
+        "roles":[],
+        "channel":["dm","text"],
+        "help":"Command not found."
+    },
+    "help":{
+        "roles":[],
+        "channel":["dm","text"],
+        "help":"Usage: !help <command>\nDM me for list of commands: !commands"
+    },
+    "commands":{
+        "roles":[],
+        "channel":["dm"],
+        "help":"Usage: !commands"
+    },
+    "addlink":{
+        "roles":["Mods"],
+        "channel":["text"],
+        "help":"Usage: !addlink <link-name>,<link>,<tag1>,<tag2>..."
+    },
+    "getlink":{
+        "roles":[],
+        "channel":["dm","text"],
+        "help":"Usage: !getlink <link-name>"
+    },
+    "deletelink":{
+        "roles":["Mods"],
+        "channel":["text"],
+        "help":"Usage: !deletelink <link-name>"
+    },
+    "deletelast":{
+        "roles":["Mods"],
+        "channel":["text"],
+        "help":"Usage: !deletelast"
+    },
+    "findlinks":{
+        "roles":[],
+        "channel":["dm"],
+        "help":"Usage: !findlinks <tag1> <tag2>..."
+    }
+}

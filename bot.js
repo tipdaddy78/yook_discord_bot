@@ -20,6 +20,6 @@ bot.on('ready', (evt) => {
 
 bot.on('message', msg => {
     let cmd = new Cmd(msg);
-    cmd.parseBang();
+    cmd.parseInput();
 });
 bot.login(auth.token)
