@@ -43,8 +43,8 @@ module.exports = class Cmd {
     parseInput() {
         if(this.content[0] == '!') {
             let cmd = this.content.substring(1).split(' ')[0];
+            let args = this.content.substring(1+cmd.length+1).toLowerCase().split(', ');
             cmd = (cmd)? cmd : "invalid";
-            let args = this.content.substring(1+cmd.length+1).split(', ');
             if(this.checkChannel(cmd)){
                 this.fetchCommand(cmd, args);
             }
@@ -95,7 +95,7 @@ module.exports = class Cmd {
                 this.cmdDeleteLast();
                 break;
                 case "findlinks":
-                this.cmdFindLinks((args.length > 0)? args:null);
+                this.cmdFindLinks(args);
                 break;
                 default:
                 this.sendMessage(cmdList["invalid"].help);
@@ -223,7 +223,12 @@ module.exports = class Cmd {
                 out += links[key].data;
                 out += '>\n'
             }
-            this.sendMessage(out);
+            if(out.length > 0) {
+                this.sendMessage(out);
+            }
+            else {
+                this.sendMessage('No links found for tags:' + tags.toString());
+            }
         }
         else {
             this.reply('You must enter at least 1 tag to search.');
