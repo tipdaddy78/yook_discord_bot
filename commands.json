@@ -18,7 +18,20 @@
             "```!addlink -link, -name, -tag1, -tag2, ...```",
             "-Links must start with \"http\"",
             "-Link names and tags may contain spaces, and are NOT case sensitive",
-            "-You may include as many tags as you want"]
+            "-You may include as many tags as you want"
+        ],
+        "confirm":{
+            "added":"Link added!",
+            "overwrite":"Link overwritten!"
+        },
+        "errors":{
+            "badlink":"Only links beginning with http or https allowed!",
+            "missingarg":[
+                "You must provide a link, name, and at least 1 tag.",
+                "Separate arguments by a comma followed by a space: `-arg1, -arg2`",
+                "For more info, use `!help addlink`"
+            ]
+        }
     },
     "getlink":{
         "roles":[],
@@ -27,7 +40,11 @@
             "```!getlink -name```",
             "-Link names may contain spaces and are NOT case sensitive",
             "-To search for links, use `!findlinks`"
-        ]
+        ],
+        "errors":{
+            "notfound":"No link with that name",
+            "noinput":"Please enter the name of the link to get"
+        }
     },
     "deletelink":{
         "roles":["Mods","Admin"],

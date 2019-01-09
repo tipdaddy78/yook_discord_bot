@@ -6,12 +6,16 @@ module.exports = class Database {
         this.filepath = filepath;
     }
     add(name, data, tags) {
+        let flags = {"overwrite":false};
+        if(this.db[name]) {
+            flags.overwrite = true;
+        }
         this.db[name] = {
             "data":data,
             "tags":tags
         };
         this.updateDB();
-        return true;
+        return flags;
     }
     delete(name) {
         for(let o in this.db) {

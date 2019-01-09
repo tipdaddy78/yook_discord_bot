@@ -77,27 +77,13 @@ module.exports = class Cmd {
     fetchCommand(cmd, args) {
         if(this.hasPermission(cmd,this.ch_type)) {
             switch(cmd) {
-                case "help":
-                this.cmdHelp((args[0])? args[0] : cmd);
-                break;
-                case "addlink":
-                this.cmdAddLink(args);
-                break;
-                case "getlink":
-                this.cmdGetLink(args[0]);
-                break;
-                case "deletelink":
-                this.cmdDeleteLink(args[0]);
-                break;
-                case "deletelast":
-                this.cmdDeleteLast();
-                break;
-                case "findlinks":
-                this.cmdFindLinks(args);
-                break;
-                default:
-                this.sendMessage(cmdList["invalid"].help);
-                break;
+                case "help": this.cmdHelp((args[0])? args[0] : cmd); break;
+                case "addlink": this.cmdAddLink(args); break;
+                case "getlink": this.cmdGetLink(args[0]); break;
+                case "deletelink": this.cmdDeleteLink(args[0]); break;
+                case "deletelast": this.cmdDeleteLast(); break;
+                case "findlinks": this.cmdFindLinks(args); break;
+                default: this.sendMessage(cmdList["invalid"].help); break;
             }
         }
         else {
@@ -116,71 +102,72 @@ module.exports = class Cmd {
     //          You can use these commands here:
     //          !help, !cmd1, !cmd2, !cmd3...
     cmdHelp(cmd) {
-        if(cmd) {
-            let out = "Usage of this command:\n";
-            for(let i = 0; i < cmdList[cmd].help.length; i++) {
-                out += cmdList[cmd].help[i];
-                out += '\n';
-            }
-            out += (cmd == 'help')? this.getCmdList():this.getRolesList(cmd);
-            this.sendMessage(out);
+        let out = ["Usage of this command:"];
+        for(let i = 0; i < cmdList[cmd].help.length; i++) {
+            out.push(cmdList[cmd].help[i]);
         }
-        else {
-            this.sendMessage('Usage: !help -command');
+        let list = ((cmd == 'help')? this.getCmdList():this.getRolesList(cmd));
+        for(let l in list) {
+            out.push(list[l]);
         }
+        this.sendMessage(out);
     }
     getCmdList() {
-        let out = 'You can use these commands here:\n';
+        let out = ['You can use these commands here:'];
         let cmds = [];
         for(let c in cmdList) {
             if(c != "invalid" && cmdList[c].channels.includes(this.ch_type)) {
                 cmds.push(c);
             }
         }
-        for(let i = 0; i < cmds.length; i++) {
-            out += '!' + cmds[i];
-            out += (i != cmds.length - 1)? ', ':'';
+        for(let c in cmds) {
+            cmds[c] = '`!' + cmds[c] + '`';
         }
+        out.push(cmds);
         return out;
     }
     getRolesList(cmd) {
-        let out = 'You must have one of these roles to use this command:\n';
-        let roles = [];
-        if(cmdList[cmd].channels.includes('text') && this.ch_type == 'text') {
-            for(let i = 0; i < cmdList[cmd].roles.length; i++) {
-                roles.push(cmdList[cmd].roles[i]);
+        if(cmdList[cmd].roles.length > 0) {
+            let out = ['You must have one of these roles to use this command:'];
+            if(cmdList[cmd].channels.includes('text') && this.ch_type == 'text') {
+                let roles = [];
+                for(let r in cmdList[cmd].roles) {
+                    roles[r] = ('`' + cmdList[cmd].roles[r] + '`');
+                }
+                out.push(roles.toString());
             }
+            return out;
         }
-        for(let i = 0; i < roles.length; i++) {
-            out += '`' + roles[i] + '`';
-            out += (i != roles.length - 1)? ', ':'';
-        }
-        return out;
+        return null;
     }
-
     //Addlink command will add a new link to a list of links associated
     //with a name in an xml doc
     //Example:  !addlink meme https://dank.meme
     //          Your link has been added!
     cmdAddLink(args) {
-        let link = args[0];
-        let name = args[1].toLowerCase();
-        let tags = [];
-        for(let i = 2; i < args.length; i++) {
-            tags.push(args[i].toLowerCase());
-        }
-        if(name && link && tags.length >= 1) {
+        if(args.length >= 3) {
+            let cmd = cmdList.addlink;
+            let link = args[0];
+            let name = args[1].toLowerCase();
+            let tags = [];
+            for(let i = 2; i < args.length; i++) {
+                tags.push(args[i].toLowerCase());
+            }
             if(link.substring(0,4) == "http") {
-                this.db.add(name, link, tags);
-                this.reply('Link added!');
+                let flags = this.db.add(name, link, tags);
+                if(!flags.overwrite) {
+                    this.reply(cmd.confirm.added);
+                }
+                else {
+                    this.reply(cmd.confirm.overwrite);
+                }
             }
             else {
-                this.reply('Only links beginning with http or https allowed!');
+                this.reply(cmd.errors.badlink);
             }
         }
         else {
-            this.reply('You must provide a link, name, and at least 1 tag.\n'
-            +'Separate arguments by a comma followed by a space: `-arg1, -arg2`');
+            this.reply(cmd.errors.missingarg);
         }
     }
     //Getlink command will reply to user the exact link with the specified
@@ -194,11 +181,11 @@ module.exports = class Cmd {
                 this.reply(out);
             }
             else {
-                this.reply('No link with that name.');
+                this.reply(cmdList.getlink.errors.notfound);
             }
         }
         else {
-            this.reply('Please enter the name of the link to get');
+            this.reply(cmdList.getlink.errors.noinput);
         }
     }
     //Deletelink command deletes the link with specified name in the
@@ -243,9 +230,9 @@ module.exports = class Cmd {
             links = this.db.find(tags);
             for(let key in links) {
                 out += key;
-                out += ': <';
+                out += ': [';
                 out += links[key].data;
-                out += '>\n'
+                out += ']\n'
             }
             if(out.length > 0) {
                 this.sendMessage(out);
