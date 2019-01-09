@@ -1,25 +1,19 @@
 {
     "invalid":{
         "roles":[],
-        "channel":["dm","text"],
+        "channels":["dm","text"],
         "help":["Command not found."]
     },
     "help":{
         "roles":[],
-        "channel":["dm","text"],
+        "channels":["dm","text"],
         "help":[
-            "```!help -command```",
-            "DM me for list of commands: !commands"
+            "```!help -command```"
         ]
     },
-    "commands":{
-        "roles":[],
-        "channel":["dm"],
-        "help":["```!commands```"]
-    },
     "addlink":{
-        "roles":["Mods"],
-        "channel":["text"],
+        "roles":["Mods","Admin"],
+        "channels":["text"],
         "help":[
             "```!addlink -link, -name, -tag1, -tag2, ...```",
             "-Links must start with \"http\"",
@@ -28,16 +22,16 @@
     },
     "getlink":{
         "roles":[],
-        "channel":["dm","text"],
+        "channels":["dm","text"],
         "help":[
             "```!getlink -name```",
             "-Link names may contain spaces and are NOT case sensitive",
-            "-To search for links, use !findlinks"
+            "-To search for links, use `!findlinks`"
         ]
     },
     "deletelink":{
-        "roles":["Mods"],
-        "channel":["text"],
+        "roles":["Mods","Admin"],
+        "channels":["text"],
         "help":[
             "```!deletelink -name```",
             "-Link names may contain spaces and are NOT case sensitive",
@@ -45,8 +39,8 @@
         ]
     },
     "deletelast":{
-        "roles":["Mods"],
-        "channel":["text"],
+        "roles":["Mods","Admin"],
+        "channels":["text"],
         "help":[
             "```!deletelast```",
             "-This command cannot be undone, and takes effect immediately"
@@ -54,7 +48,7 @@
     },
     "findlinks":{
         "roles":[],
-        "channel":["dm"],
+        "channels":["dm"],
         "help":[
             "```!findlinks -tag1, -tag2, ...```",
             "-Tags may contain spaces, and are NOT case sensitive"

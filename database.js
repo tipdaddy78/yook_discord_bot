@@ -17,10 +17,10 @@ module.exports = class Database {
         for(let o in this.db) {
             if(name === o) {
                 delete this.db[name];
+                this.updateDB();
                 return true;
             }
         }
-        this.updateDB();
         return false;
     }
     deleteLast() {
@@ -62,7 +62,7 @@ module.exports = class Database {
         return out;
     }
     updateDB() {
-        fs.writeFile(this.filepath, JSON.stringify(this.db, null, 2), (err) => {
+        fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) => {
             if(err) throw err;
         });
     }

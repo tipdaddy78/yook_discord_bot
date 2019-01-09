@@ -13,7 +13,7 @@ module.exports = class Cmd {
         this.msg = message;
         this.content = message.content;
         this.username = message.author.username;
-        this.member = message.member;
+        this.roles = (message.member)? message.member.roles:null;
         this.channel = message.channel;
         this.ch_type = message.channel.type;
         this.db = new Database('./links.json', linksDB);
@@ -26,42 +26,43 @@ module.exports = class Cmd {
     reply(content) {
         return this.msg.reply(content);
     }
-    //Returns whether command is being used in proper channel type
-    checkChannel(cmd) {
-        let ret = false;
-        for(let i = 0; i < cmdList[cmd].channel.length; i++) {
-            if(this.ch_type == cmdList[cmd].channel[i]) {
-                ret = true;
-            }
-        }
-        return ret;
-    }
     //Returns specified role of member if member contains it
     checkRole(role) {
-        return this.member.roles.find(r => r.name === role);
+        return this.roles.find(r => r.name === role);
     }
     parseInput() {
         if(this.content[0] == '!') {
             let cmd = this.content.substring(1).split(' ')[0];
             let args = this.content.substring(1+cmd.length+1).toLowerCase().split(', ');
-            cmd = (cmd)? cmd : "invalid";
             if(this.checkChannel(cmd)){
                 this.fetchCommand(cmd, args);
             }
             else {
-                let out = 'That command can only be used in:\n';
-                for(let i = 0; i < cmdList[cmd].channel.length; i++) {
-                    let tmp = cmdList[cmd].channel[i];
-                    out += (tmp == "text")? "server":tmp;
-                    out += ' channels';
-                    out += (i != cmdList[cmd].channel.length - 1)? ', ':'';
-                }
-                this.reply(out);
+                this.reply(this.wrongChannel(cmd));
             }
         }
     }
+    //Returns whether command is being used in proper channel type
+    checkChannel(cmd) {
+        for(let i = 0; i < cmdList[cmd].channels.length; i++) {
+            if(this.ch_type == cmdList[cmd].channels[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    wrongChannel(cmd) {
+        let out = 'That command can only be used in:\n';
+        for(let i = 0; i < cmdList[cmd].channels.length; i++) {
+            let tmp = cmdList[cmd].channels[i];
+            out += (tmp == "text")? "server":tmp;
+            out += ' channels';
+            out += (i != cmdList[cmd].channels.length - 1)? ', ':'';
+        }
+        return out;
+    }
     hasPermission(cmd, channel) {
-        if(channel == "text") {
+        if(this.channel == "text") {
             if(cmdList[cmd].roles.toString()) {
                 for(let i=0; i < cmdList[cmd].roles.length; i++) {
                     if(this.checkRole(cmdList[cmd].roles[i])) {
@@ -78,9 +79,6 @@ module.exports = class Cmd {
             switch(cmd) {
                 case "help":
                 this.cmdHelp((args[0])? args[0] : cmd);
-                break;
-                case "commands":
-                this.cmdCommands();
                 break;
                 case "addlink":
                 this.cmdAddLink(args);
@@ -112,6 +110,11 @@ module.exports = class Cmd {
     //          @user !help [cmd]
     //          !help cmd
     //          @user !cmd [arg1] [arg2]... [argN]
+    //          -arg1 information
+    //          -arg2 information
+    //          ...
+    //          You can use these commands here:
+    //          !help, !cmd1, !cmd2, !cmd3...
     cmdHelp(cmd) {
         if(cmd) {
             let out = "Usage of this command:\n";
@@ -119,26 +122,42 @@ module.exports = class Cmd {
                 out += cmdList[cmd].help[i];
                 out += '\n';
             }
+            out += (cmd == 'help')? this.getCmdList():this.getRolesList(cmd);
             this.sendMessage(out);
         }
         else {
-            this.sendMessage('Usage: !help <command>');
+            this.sendMessage('Usage: !help -command');
         }
     }
-    //Commandlist will send a reply to current user with the full list
-    //of available commands
-    //Example:  !commandlist
-    //          @user, ping, me, wakeup, shutup, checkmod, help
-    cmdCommands() {
-        let out = '';
+    getCmdList() {
+        let out = 'You can use these commands here:\n';
+        let cmds = [];
         for(let c in cmdList) {
-            if(c != "invalid") {
-                    out += '!' + c ;
-                    out += ',' + ' ';
+            if(c != "invalid" && cmdList[c].channels.includes(this.ch_type)) {
+                cmds.push(c);
             }
         }
-        this.reply(out);
+        for(let i = 0; i < cmds.length; i++) {
+            out += '!' + cmds[i];
+            out += (i != cmds.length - 1)? ', ':'';
+        }
+        return out;
     }
+    getRolesList(cmd) {
+        let out = 'You must have one of these roles to use this command:\n';
+        let roles = [];
+        if(cmdList[cmd].channels.includes('text') && this.ch_type == 'text') {
+            for(let i = 0; i < cmdList[cmd].roles.length; i++) {
+                roles.push(cmdList[cmd].roles[i]);
+            }
+        }
+        for(let i = 0; i < roles.length; i++) {
+            out += '`' + roles[i] + '`';
+            out += (i != roles.length - 1)? ', ':'';
+        }
+        return out;
+    }
+
     //Addlink command will add a new link to a list of links associated
     //with a name in an xml doc
     //Example:  !addlink meme https://dank.meme
@@ -150,7 +169,7 @@ module.exports = class Cmd {
         for(let i = 2; i < args.length; i++) {
             tags.push(args[i].toLowerCase());
         }
-        if(name && link && tags.length > 1) {
+        if(name && link && tags.length >= 1) {
             if(link.substring(0,4) == "http") {
                 this.db.add(name, link, tags);
                 this.reply('Link added!');
@@ -212,6 +231,11 @@ module.exports = class Cmd {
             this.reply('There are no links to delete.');
         }
     }
+    //Searches database for links containing specified list of tags. This function
+    //will only return links that contain all specified tags
+    //Example:  !findlinks tag1, tag2, tag3
+    //          link 1: https://a-link
+    //          link 2: https://b-link
     cmdFindLinks(tags) {
         let links = {};
         let out = '';
