@@ -2,41 +2,62 @@
     "invalid":{
         "roles":[],
         "channel":["dm","text"],
-        "help":"Command not found."
+        "help":["Command not found."]
     },
     "help":{
         "roles":[],
         "channel":["dm","text"],
-        "help":"Usage: !help <command>\nDM me for list of commands: !commands"
+        "help":[
+            "```!help -command```",
+            "DM me for list of commands: !commands"
+        ]
     },
     "commands":{
         "roles":[],
         "channel":["dm"],
-        "help":"Usage: !commands"
+        "help":["```!commands```"]
     },
     "addlink":{
         "roles":["Mods"],
         "channel":["text"],
-        "help":"Usage: !addlink <link-name>,<link>,<tag1>,<tag2>..."
+        "help":[
+            "```!addlink -link, -name, -tag1, -tag2, ...```",
+            "-Links must start with \"http\"",
+            "-Link names and tags may contain spaces, and are NOT case sensitive",
+            "-You may include as many tags as you want"]
     },
     "getlink":{
         "roles":[],
         "channel":["dm","text"],
-        "help":"Usage: !getlink <link-name>"
+        "help":[
+            "```!getlink -name```",
+            "-Link names may contain spaces and are NOT case sensitive",
+            "-To search for links, use !findlinks"
+        ]
     },
     "deletelink":{
         "roles":["Mods"],
         "channel":["text"],
-        "help":"Usage: !deletelink <link-name>"
+        "help":[
+            "```!deletelink -name```",
+            "-Link names may contain spaces and are NOT case sensitive",
+            "-This command cannot be undone, and takes effect immediately"
+        ]
     },
     "deletelast":{
         "roles":["Mods"],
         "channel":["text"],
-        "help":"Usage: !deletelast"
+        "help":[
+            "```!deletelast```",
+            "-This command cannot be undone, and takes effect immediately"
+        ]
     },
     "findlinks":{
         "roles":[],
         "channel":["dm"],
-        "help":"Usage: !findlinks <tag1> <tag2>..."
+        "help":[
+            "```!findlinks -tag1, -tag2, ...```",
+            "-Tags may contain spaces, and are NOT case sensitive"
+        ]
     }
 }

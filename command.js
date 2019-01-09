@@ -14,7 +14,6 @@ module.exports = class Cmd {
         this.content = message.content;
         this.username = message.author.username;
         this.member = message.member;
-        this.guild = message.guild;
         this.channel = message.channel;
         this.ch_type = message.channel.type;
         this.db = new Database('./links.json', linksDB);
@@ -27,57 +26,35 @@ module.exports = class Cmd {
     reply(content) {
         return this.msg.reply(content);
     }
-    //Returns specified GuildMember by username
-    getMember(name) {
-        return this.guild.members.find(m => m.displayName === name);
-    }
-    //Returns userid of specified user in guild
-    getUserId(name) {
-        return this.getMember(name).user.id;
-    }
     //Returns whether command is being used in proper channel type
     checkChannel(cmd) {
-        for(let ch in cmdList[cmd].channel) {
-            if(this.ch_type == ch){
-                return true;
+        let ret = false;
+        for(let i = 0; i < cmdList[cmd].channel.length; i++) {
+            if(this.ch_type == cmdList[cmd].channel[i]) {
+                ret = true;
             }
         }
-        return false;
+        return ret;
     }
     //Returns specified role of member if member contains it
     checkRole(role) {
         return this.member.roles.find(r => r.name === role);
     }
-    //Generates mention string with specified userid
-    mention(userid) {
-        let out = ' ';
-        out += '<';
-        out += '@';
-        out += userid;
-        out += '>';
-        return out;
-    }
     parseInput() {
         if(this.content[0] == '!') {
-            let args = this.content.substring(1).split(' ');
-            let cmd = (args[0])? args[0] : "invalid";
+            let cmd = this.content.substring(1).split(' ')[0];
+            cmd = (cmd)? cmd : "invalid";
+            let args = this.content.substring(1+cmd.length+1).split(', ');
             if(this.checkChannel(cmd)){
-                if(this.hasPermission(cmd,this.ch_type)) {
-                    fetchCommand(cmd, [args[1], args[2]]);
-                }
-                else {
-                    this.reply('You must be: '
-                    + cmdList[cmd].roles.toString())
-                }
+                this.fetchCommand(cmd, args);
             }
             else {
-                let out = 'That command can only be used in a:\n';
-                for(let ch in cmdList[cmd].channel) {
-                    switch(ch){
-                        case "dm": out += 'DM'; break;
-                        case "text": out += 'Channel'; break;
-                    }
-                    out += ', ';
+                let out = 'That command can only be used in:\n';
+                for(let i = 0; i < cmdList[cmd].channel.length; i++) {
+                    let tmp = cmdList[cmd].channel[i];
+                    out += (tmp == "text")? "server":tmp;
+                    out += ' channels';
+                    out += (i != cmdList[cmd].channel.length - 1)? ', ':'';
                 }
                 this.reply(out);
             }
@@ -85,9 +62,9 @@ module.exports = class Cmd {
     }
     hasPermission(cmd, channel) {
         if(channel == "text") {
-            if(cmdList[cmd].roles) {
-                for(let r in cmdList[cmd].roles) {
-                    if(this.checkRole(r)) {
+            if(cmdList[cmd].roles.toString()) {
+                for(let i=0; i < cmdList[cmd].roles.length; i++) {
+                    if(this.checkRole(cmdList[cmd].roles[i])) {
                         return true;
                     }
                 }
@@ -97,28 +74,37 @@ module.exports = class Cmd {
         return true;
     }
     fetchCommand(cmd, args) {
-        switch(cmd) {
-            case "help":
-            this.cmdHelp((args[1])? args[1] : cmd);
-            break;
-            case "commands":
-            this.cmdCommands();
-            break;
-            case "addlink":
-            this.cmdAddLink(args[1], args[2]);
-            break;
-            case "getlink":
-            this.cmdGetLink(args[1]);
-            break;
-            case "deletelink":
-            this.cmdDeleteLink(args[1]);
-            break;
-            case "deletelast":
-            this.cmdDeleteLast();
-            break;
-            default:
-            this.sendMessage(cmdList["invalid"].help);
-            break;
+        if(this.hasPermission(cmd,this.ch_type)) {
+            switch(cmd) {
+                case "help":
+                this.cmdHelp((args[0])? args[0] : cmd);
+                break;
+                case "commands":
+                this.cmdCommands();
+                break;
+                case "addlink":
+                this.cmdAddLink(args);
+                break;
+                case "getlink":
+                this.cmdGetLink(args[0]);
+                break;
+                case "deletelink":
+                this.cmdDeleteLink(args[0]);
+                break;
+                case "deletelast":
+                this.cmdDeleteLast();
+                break;
+                case "findlinks":
+                this.cmdFindLinks((args.length > 0)? args:null);
+                break;
+                default:
+                this.sendMessage(cmdList["invalid"].help);
+                break;
+            }
+        }
+        else {
+            this.reply('You must be: '
+            + cmdList[cmd].roles.toString());
         }
     }
     //Help command will provide information for specified commands.
@@ -128,7 +114,12 @@ module.exports = class Cmd {
     //          @user !cmd [arg1] [arg2]... [argN]
     cmdHelp(cmd) {
         if(cmd) {
-            this.sendMessage(cmdList[cmd].help);
+            let out = "Usage of this command:\n";
+            for(let i = 0; i < cmdList[cmd].help.length; i++) {
+                out += cmdList[cmd].help[i];
+                out += '\n';
+            }
+            this.sendMessage(out);
         }
         else {
             this.sendMessage('Usage: !help <command>');
@@ -139,41 +130,38 @@ module.exports = class Cmd {
     //Example:  !commandlist
     //          @user, ping, me, wakeup, shutup, checkmod, help
     cmdCommands() {
-        if(this.isMod(this.username)) {
-            let out = '';
-            for(let c in cmdList) {
-                if(c != "invalid") {
-                        out += '!' + c ;
-                        out += ',' + ' ';
-                }
+        let out = '';
+        for(let c in cmdList) {
+            if(c != "invalid") {
+                    out += '!' + c ;
+                    out += ',' + ' ';
             }
-            this.reply(out);
         }
-        else {
-            this.reply('You don\'t have permission to use this command');
-        }
+        this.reply(out);
     }
     //Addlink command will add a new link to a list of links associated
     //with a name in an xml doc
     //Example:  !addlink meme https://dank.meme
     //          Your link has been added!
-    cmdAddLink(name, link) {
-        if(this.isMod(this.username)) {
-            if(name && link) {
-                if(link.substring(0,4) === "http") {
-                    this.db.add(name, link);
-                    this.reply('Link added!');
-                }
-                else {
-                    this.reply('Only links beginning with http or https allowed!');
-                }
+    cmdAddLink(args) {
+        let link = args[0];
+        let name = args[1].toLowerCase();
+        let tags = [];
+        for(let i = 2; i < args.length; i++) {
+            tags.push(args[i].toLowerCase());
+        }
+        if(name && link && tags.length > 1) {
+            if(link.substring(0,4) == "http") {
+                this.db.add(name, link, tags);
+                this.reply('Link added!');
             }
             else {
-                this.reply('Please provide both a name and link!');
+                this.reply('Only links beginning with http or https allowed!');
             }
         }
         else {
-            this.reply('This command can only be used by mods!');
+            this.reply('You must provide a link, name, and at least 1 tag.\n'
+            +'Separate arguments by a comma followed by a space: `-arg1, -arg2`');
         }
     }
     //Getlink command will reply to user the exact link with the specified
@@ -182,9 +170,9 @@ module.exports = class Cmd {
     //          @user, https://dank.meme
     cmdGetLink(name) {
         if(name) {
-            let link = this.db.get(name);
-            if(link) {
-                this.reply(link);
+            let out = this.db.get(name);
+            if(out) {
+                this.reply(out);
             }
             else {
                 this.reply('No link with that name.');
@@ -199,39 +187,46 @@ module.exports = class Cmd {
     //Example:  !deletelink meme
     //          @user, Successfully deleted link.
     cmdDeleteLink(name) {
-        if(this.isMod(this.username)) {
-            if(name) {
-                let d = this.db.delete(name);
-                if(d) {
-                    this.reply('Successfully deleted link.');
-                }
-                else {
-                    this.reply('No link with that name in database.');
-                }
+        if(name) {
+            let d = this.db.delete(name);
+            if(d) {
+                this.reply('Successfully deleted link.');
             }
             else {
-                this.reply('Please enter the name of the link to delete');
+                this.reply('No link with that name in database.');
             }
         }
         else {
-            this.reply('This command can only be used by mods!');
+            this.reply('Please enter the name of the link to delete');
         }
     }
     //Deletelast command deletes last link in the links.json file
     //Example:  !deletelast
     //          @user, Successfully deleted last link.
     cmdDeleteLast() {
-        if(this.isMod(this.username)) {
-            let d = this.db.deleteLast();
-            if(d) {
-                this.reply('Successfully deleted last link.');
-            }
-            else {
-                this.reply('There are no links to delete.');
-            }
+        let d = this.db.deleteLast();
+        if(d) {
+            this.reply('Successfully deleted last link.');
         }
         else {
-            this.reply('This command can only be used by mods!');
+            this.reply('There are no links to delete.');
+        }
+    }
+    cmdFindLinks(tags) {
+        let links = {};
+        let out = '';
+        if(tags) {
+            links = this.db.find(tags);
+            for(let key in links) {
+                out += key;
+                out += ': <';
+                out += links[key].data;
+                out += '>\n'
+            }
+            this.sendMessage(out);
+        }
+        else {
+            this.reply('You must enter at least 1 tag to search.');
         }
     }
 }
