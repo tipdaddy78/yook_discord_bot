@@ -42,6 +42,7 @@ module.exports = class Cmd {
                     else if (args[a][0]=='!') {
                         args[a] = args[a].substring(1);
                     }
+                    args[a] = args[a].trim();
                 }
                 if(this.checkChannel(cmd)){
                     this.fetchCommand(cmd, args);
@@ -71,14 +72,14 @@ module.exports = class Cmd {
         return out;
     }
     hasPermission(cmd, channel) {
-        if(this.channel == "text") {
-            if(cmdList[cmd].roles.toString()) {
-                for(let i=0; i < cmdList[cmd].roles.length; i++) {
-                    if(this.checkRole(cmdList[cmd].roles[i])) {
+        if(this.ch_type == 'text') {
+            if(cmdList[cmd].roles.length > 0) {
+                for(let r in cmdList[cmd].roles) {
+                    if(this.checkRole(cmdList[cmd].roles[r])) {
                         return true;
                     }
                 }
-                this.reply('You must be: ' + cmdList[cmd].roles.toString());
+                this.sendMessage(this.getRolesList(cmd));
                 return false;
             }
         }
@@ -90,7 +91,6 @@ module.exports = class Cmd {
                 return true;
             }
         }
-        // this.sendMessage(this.getHelpOutput("help"));
         this.sendMessage(this.getCmdList());
         return false
     }
@@ -177,28 +177,28 @@ module.exports = class Cmd {
     //          Your link has been added!
     cmdAddLink(args) {
         if(args.length >= 3) {
-            let cmd = cmdList.addlink;
             let link = args[0];
             let name = args[1].toLowerCase();
             let tags = [];
+            let op = this.username;
             for(let i = 2; i < args.length; i++) {
                 tags.push(args[i].toLowerCase());
             }
             if(link.substring(0,4) == "http") {
-                let flags = this.db.add(name, link, tags);
+                let flags = this.db.add(name, link, tags, op);
                 if(!flags.overwrite) {
-                    this.reply(cmd.confirm.added);
+                    this.reply(cmdList.addlink.confirm.added);
                 }
                 else {
-                    this.reply(cmd.confirm.overwrite);
+                    this.reply(cmdList.addlink.confirm.overwrite);
                 }
             }
             else {
-                this.reply(cmd.errors.badlink);
+                this.reply(cmdList.addlink.errors.badlink);
             }
         }
         else {
-            this.reply(cmd.errors.missingarg);
+            this.reply(cmdList.addlink.errors.missingarg);
         }
     }
     //Getlink command will reply to user the exact link with the specified
@@ -263,7 +263,9 @@ module.exports = class Cmd {
                 out += key;
                 out += ': [';
                 out += links[key].data;
-                out += ']\n'
+                out += '] Posted by ';
+                out += links[key].op;
+                out += '\n';
             }
             if(out.length > 0) {
                 this.sendMessage(out);

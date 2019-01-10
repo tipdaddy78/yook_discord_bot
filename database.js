@@ -5,14 +5,15 @@ module.exports = class Database {
         this.db = json;
         this.filepath = filepath;
     }
-    add(name, data, tags) {
+    add(name, data, tags, op) {
         let flags = {"overwrite":false};
         if(this.db[name]) {
             flags.overwrite = true;
         }
         this.db[name] = {
             "data":data,
-            "tags":tags
+            "tags":tags,
+            "op":op
         };
         this.updateDB();
         return flags;
@@ -43,6 +44,8 @@ module.exports = class Database {
                 out = this.db[name].data;
                 out += '\nTags: '
                 out += this.db[name].tags;
+                out += '\nPosted by ';
+                out += this.db[name].op;
             }
         }
         return out;
@@ -77,7 +80,8 @@ module.exports = class Database {
             if(count == tags.length) {
                 out[key] = {
                     "data":this.db[key].data,
-                    "tags":this.db[key].tags
+                    "tags":this.db[key].tags,
+                    "op":this.db[key].op
                 };
             }
         }
