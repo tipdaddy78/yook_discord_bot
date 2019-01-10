@@ -3,8 +3,7 @@
         "roles":[],
         "channels":["dm","text"],
         "help":[
-            "Command not found.",
-            "Use `!help` for a list of commands."]
+            "Command not found."]
     },
     "help":{
         "roles":[],
@@ -14,7 +13,7 @@
         ]
     },
     "addlink":{
-        "roles":["Mods","Admin"],
+        "roles":["Mods","Admin","tester"],
         "channels":["text"],
         "help":[
             "```!addlink -link, -name, -tag1, -tag2, ...```",
@@ -41,7 +40,7 @@
         "help":[
             "```!getlink -name```",
             "-Link names may contain spaces and are NOT case sensitive",
-            "-To search for links, use `!findlinks`"
+            "-To search for links, DM me `!findlinks`"
         ],
         "errors":{
             "notfound":"No link with that name",
@@ -71,6 +70,15 @@
         "help":[
             "```!findlinks -tag1, -tag2, ...```",
             "-Tags may contain spaces, and are NOT case sensitive"
+        ]
+    },
+    "showall":{
+        "roles":[],
+        "channels":["dm"],
+        "help":[
+            "```!showall -attribute```",
+            "-Valid attributes: `links`, `tags`",
+            "-Can only be used in a DM with me."
         ]
     }
 }

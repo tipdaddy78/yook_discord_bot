@@ -47,6 +47,24 @@ module.exports = class Database {
         }
         return out;
     }
+    getAllTags() {
+        let out = [];
+        for(let key in this.db) {
+            for(let t in this.db[key].tags) {
+                if(!out.includes(this.db[key].tags[t])) {
+                    out.push(this.db[key].tags[t]);
+                }
+            }
+        }
+        return out;
+    }
+    getAllLinks() {
+        let out = [];
+        for(let key in this.db) {
+            out.push('[' + key + ']: (' + this.db[key].data + ')');
+        }
+        return out;
+    }
     find(tags) {
         let out = {};
         for(let key in this.db) {

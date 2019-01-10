@@ -56,7 +56,8 @@ module.exports = class Cmd {
                 return true;
             }
         }
-        this.reply(this.wrongChannel(cmd));
+        this.sendMessage(this.wrongChannel(cmd));
+        this.sendMessage(this.getCmdList());
         return false;
     }
     wrongChannel(cmd) {
@@ -89,7 +90,8 @@ module.exports = class Cmd {
                 return true;
             }
         }
-        this.reply([cmdList.invalid.help,this.getCmdList()]);
+        // this.sendMessage(this.getHelpOutput("help"));
+        this.sendMessage(this.getCmdList());
         return false
     }
     fetchCommand(cmd, args) {
@@ -101,6 +103,7 @@ module.exports = class Cmd {
                 case "deletelink": this.cmdDeleteLink(args[0]); break;
                 case "deletelast": this.cmdDeleteLast(); break;
                 case "findlinks": this.cmdFindLinks(args); break;
+                case "showall": this.cmdShowAll(args); break;
                 default: this.sendMessage(cmdList["invalid"].help); break;
             }
         }
@@ -116,20 +119,32 @@ module.exports = class Cmd {
     //          You can use these commands here:
     //          !help, !cmd1, !cmd2, !cmd3...
     cmdHelp(cmd) {
-        if(this.cmdExists(cmd)) {
-            let out = ["Usage of this command:"];
-            for(let i = 0; i < cmdList[cmd].help.length; i++) {
-                out.push(cmdList[cmd].help[i]);
+        if(cmdList.hasOwnProperty(cmd)) {
+            if(cmdList[cmd].channels.includes(this.ch_type)) {
+                let out = this.getHelpOutput(cmd);
+                let list = ((cmd == 'help')? this.getCmdList():this.getRolesList(cmd));
+                for(let l in list) {
+                    out.push(list[l]);
+                }
+                this.sendMessage(out);
             }
-            let list = ((cmd == 'help')? this.getCmdList():this.getRolesList(cmd));
-            for(let l in list) {
-                out.push(list[l]);
+            else {
+                this.sendMessage(this.getCmdList());
             }
-            this.sendMessage(out);
+        }
+        else {
+            this.sendMessage(this.cmdHelp('help'));
         }
     }
+    getHelpOutput(cmd) {
+        let out = ["Usage of this command:"];
+        for(let i = 0; i < cmdList[cmd].help.length; i++) {
+            out.push(cmdList[cmd].help[i]);
+        }
+        return out;
+    }
     getCmdList() {
-        let out = ['You can use these commands here:'];
+        let out = ['You can only use these commands here:'];
         let cmds = [];
         for(let c in cmdList) {
             if(c != "invalid" && cmdList[c].channels.includes(this.ch_type)) {
@@ -259,6 +274,19 @@ module.exports = class Cmd {
         }
         else {
             this.reply('You must enter at least 1 tag to search.');
+        }
+    }
+    cmdShowAll(attribute) {
+        if(attribute == 'links') {
+            let out = this.db.getAllLinks();
+            this.sendMessage((out.length > 0)? out:'No links in database.');
+        }
+        else if (attribute == 'tags') {
+            let out = this.db.getAllTags();
+            this.sendMessage((out.length > 0)? out:'No tags in database.');
+        }
+        else {
+            this.cmdHelp("showall");
         }
     }
 }
