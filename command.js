@@ -35,15 +35,17 @@ module.exports = class Cmd {
             let cmd = this.content.substring(1).split(' ')[0];
             if(this.cmdExists(cmd)) {
                 let args = this.content.substring(1+cmd.length+1).toLowerCase().split(', ');
+                for(let a in args) {
+                    if(args[a][0]=='-') {
+                        args[a] = (args[a][1]=='!')? args[a].substring(2):args[a].substring(1);
+                    }
+                    else if (args[a][0]=='!') {
+                        args[a] = args[a].substring(1);
+                    }
+                }
                 if(this.checkChannel(cmd)){
                     this.fetchCommand(cmd, args);
                 }
-                else {
-                    this.reply(this.wrongChannel(cmd));
-                }
-            }
-            else {
-                this.reply(cmdList.invalid.help);
             }
         }
     }
@@ -54,6 +56,7 @@ module.exports = class Cmd {
                 return true;
             }
         }
+        this.reply(this.wrongChannel(cmd));
         return false;
     }
     wrongChannel(cmd) {
@@ -74,6 +77,7 @@ module.exports = class Cmd {
                         return true;
                     }
                 }
+                this.reply('You must be: ' + cmdList[cmd].roles.toString());
                 return false;
             }
         }
@@ -85,12 +89,13 @@ module.exports = class Cmd {
                 return true;
             }
         }
+        this.reply([cmdList.invalid.help,this.getCmdList()]);
         return false
     }
     fetchCommand(cmd, args) {
         if(this.hasPermission(cmd,this.ch_type)) {
             switch(cmd) {
-                case "help": this.cmdHelp((args[0])? args[0] : cmd); break;
+                case "help": this.cmdHelp(args[0]); break;
                 case "addlink": this.cmdAddLink(args); break;
                 case "getlink": this.cmdGetLink(args[0]); break;
                 case "deletelink": this.cmdDeleteLink(args[0]); break;
@@ -98,10 +103,6 @@ module.exports = class Cmd {
                 case "findlinks": this.cmdFindLinks(args); break;
                 default: this.sendMessage(cmdList["invalid"].help); break;
             }
-        }
-        else {
-            this.reply('You must be: '
-            + cmdList[cmd].roles.toString());
         }
     }
     //Help command will provide information for specified commands.
@@ -115,15 +116,17 @@ module.exports = class Cmd {
     //          You can use these commands here:
     //          !help, !cmd1, !cmd2, !cmd3...
     cmdHelp(cmd) {
-        let out = ["Usage of this command:"];
-        for(let i = 0; i < cmdList[cmd].help.length; i++) {
-            out.push(cmdList[cmd].help[i]);
+        if(this.cmdExists(cmd)) {
+            let out = ["Usage of this command:"];
+            for(let i = 0; i < cmdList[cmd].help.length; i++) {
+                out.push(cmdList[cmd].help[i]);
+            }
+            let list = ((cmd == 'help')? this.getCmdList():this.getRolesList(cmd));
+            for(let l in list) {
+                out.push(list[l]);
+            }
+            this.sendMessage(out);
         }
-        let list = ((cmd == 'help')? this.getCmdList():this.getRolesList(cmd));
-        for(let l in list) {
-            out.push(list[l]);
-        }
-        this.sendMessage(out);
     }
     getCmdList() {
         let out = ['You can use these commands here:'];
