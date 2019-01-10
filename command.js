@@ -91,6 +91,7 @@ module.exports = class Cmd {
                 return true;
             }
         }
+        this.sendMessage(cmdList.invalid.help);
         this.sendMessage(this.getCmdList());
         return false
     }
@@ -103,6 +104,7 @@ module.exports = class Cmd {
                 case "deletelink": this.cmdDeleteLink(args[0]); break;
                 case "deletelast": this.cmdDeleteLast(); break;
                 case "findlinks": this.cmdFindLinks(args); break;
+                case "filterlinks": this.cmdFilterLinks(args); break;
                 case "showall": this.cmdShowAll(args); break;
                 default: this.cmdHelp("invalid"); break;
             }
@@ -223,14 +225,14 @@ module.exports = class Cmd {
         if(name) {
             let d = this.db.delete(name);
             if(d) {
-                this.reply('Successfully deleted link.');
+                this.reply(cmdList.deletelink.confirm);
             }
             else {
-                this.reply('No link with that name in database.');
+                this.reply(cmdList.deletelink.errors.notfound);
             }
         }
         else {
-            this.reply('Please enter the name of the link to delete');
+            this.reply(cmdList.deletelink.errors.noinput);
         }
     }
     //Deletelast command deletes last link in the links.json file
@@ -239,49 +241,74 @@ module.exports = class Cmd {
     cmdDeleteLast() {
         let d = this.db.deleteLast();
         if(d) {
-            this.reply('Successfully deleted last link.');
+            this.reply(cmdList.deletelast.confirm);
         }
         else {
-            this.reply('There are no links to delete.');
+            this.reply(cmdList.deletelast.errors.nolinks);
         }
     }
-    //Searches database for links containing specified list of tags. This function
+    //Searches database for links containing ANY of the specified tags. This function
     //will only return links that contain all specified tags
     //Example:  !findlinks tag1, tag2, tag3
     //          link 1: https://a-link
     //          link 2: https://b-link
     cmdFindLinks(tags) {
-        let links = {};
-        let out = '';
         if(tags) {
-            links = this.db.find(tags);
-            for(let key in links) {
-                out += key;
-                out += ': [';
-                out += links[key].data;
-                out += '] Posted by ';
-                out += links[key].op;
-                out += '\n';
-            }
+            let links = this.db.find(tags);
+            let out = this.parseLinks(links);
             if(out.length > 0) {
                 this.sendMessage(out);
             }
             else {
-                this.sendMessage('No links found for tags:' + tags.toString());
+                this.sendMessage(cmdList.findlinks.errors.nolinks);
             }
         }
         else {
-            this.reply('You must enter at least 1 tag to search.');
+            this.reply(cmdList.findlinks.errors.notags);
         }
+    }
+    //Searches database for links containing ALL of the specified tags. This function
+    //will only return links that contain all specified tags
+    //Example:  !findlinks tag1, tag2, tag3
+    //          link 1: https://a-link
+    //          link 2: https://b-link
+    cmdFilterLinks(tags) {
+        if(tags) {
+            let links = this.db.filter(tags);
+            let out = this.parseLinks(links);
+            if(out.length > 0) {
+                this.sendMessage(out);
+            }
+            else {
+                this.sendMessage(cmdList.filterlinks.errors.nolinks);
+            }
+        }
+        else {
+            this.reply(cmdList.filterlinks.errors.notags);
+        }
+    }
+    parseLinks(links) {
+        let out = '';
+        for(let key in links) {
+            out += '[' + key;
+            out += '](';
+            out += links[key].data;
+            out += ') Posted by ';
+            out += links[key].op;
+            out += '\ntags: ';
+            out += links[key].tags;
+            out += '\n';
+        }
+        return out;
     }
     cmdShowAll(attribute) {
         if(attribute == 'links') {
-            let out = this.db.getAllLinks();
-            this.sendMessage((out.length > 0)? out:'No links in database.');
+            let out = this.db.getAllData();
+            this.sendMessage((out.length > 0)? out:cmdList.showall.errors.nodata);
         }
         else if (attribute == 'tags') {
             let out = this.db.getAllTags();
-            this.sendMessage((out.length > 0)? out:'No tags in database.');
+            this.sendMessage((out.length > 0)? out:cmdList.showall.errors.nodata);
         }
         else {
             this.cmdHelp("showall");

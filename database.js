@@ -59,16 +59,37 @@ module.exports = class Database {
                 }
             }
         }
+        out.sort();
         return out;
     }
-    getAllLinks() {
+    getAllData() {
         let out = [];
         for(let key in this.db) {
-            out.push('[' + key + ']: (' + this.db[key].data + ')');
+            out.push('[' + key + ']'
+            + '(' + this.db[key].data + ')'
+            + ': Posted by ' + this.db[key].op);
         }
+
+        out.sort();
         return out;
     }
     find(tags) {
+        let out = {};
+        for(let key in this.db) {
+            for(let i = 0; i < tags.length; i++) {
+                if(this.db[key].tags.includes(tags[i])) {
+                    out[key] = {
+                        "data":this.db[key].data,
+                        "tags":this.db[key].tags,
+                        "op":this.db[key].op
+                    };
+
+                }
+            }
+        }
+        return out;
+    }
+    filter(tags) {
         let out = {};
         for(let key in this.db) {
             let count = 0;

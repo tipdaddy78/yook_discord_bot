@@ -54,7 +54,12 @@
             "```!deletelink -name```",
             "-Link names may contain spaces and are NOT case sensitive",
             "-This command cannot be undone, and takes effect immediately"
-        ]
+        ],
+        "confirm":"Successfully deleted link.",
+        "errors":{
+            "notfound":"No link with that name in database.",
+            "noinput":"Please enter the name of the link to delete."
+        }
     },
     "deletelast":{
         "roles":["Mods","Admin"],
@@ -62,7 +67,11 @@
         "help":[
             "```!deletelast```",
             "-This command cannot be undone, and takes effect immediately"
-        ]
+        ],
+        "confirm":"Successfully deleted last link.",
+        "errors":{
+            "nolinks":"There are no links to delete."
+        }
     },
     "findlinks":{
         "roles":[],
@@ -70,7 +79,23 @@
         "help":[
             "```!findlinks -tag1, -tag2, ...```",
             "-Tags may contain spaces, and are NOT case sensitive"
-        ]
+        ],
+        "errors":{
+            "nolinks":"No links found with those tags.",
+            "notags":"You must enter at least 1 tag to find."
+        }
+    },
+    "filterlinks":{
+        "roles":[],
+        "channels":["dm"],
+        "help":[
+            "```!filterlinks -tag1 -tag2 ... -tagN```",
+            "-Tags may contain spaces and are NOT case sensitive"
+        ],
+        "errors":{
+            "nolinks":"No links with those tags.",
+            "notags":"Please enter at least 1 tag to filter."
+        }
     },
     "showall":{
         "roles":[],
@@ -79,6 +104,9 @@
             "```!showall -attribute```",
             "-Valid attributes: `links`, `tags`",
             "-Can only be used in a DM with me."
-        ]
+        ],
+        "errors":{
+            "nodata":"Database is empty."
+        }
     }
 }
