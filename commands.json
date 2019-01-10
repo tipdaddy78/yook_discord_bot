@@ -13,7 +13,7 @@
         ]
     },
     "addlink":{
-        "roles":["Mods","Admin","Testers"],
+        "roles":["Mods","Admin","Testers","Runners"],
         "channels":["text"],
         "help":[
             "```!addlink -link, -name, -tag1, -tag2, ...```",

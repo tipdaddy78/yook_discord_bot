@@ -104,7 +104,7 @@ module.exports = class Cmd {
                 case "deletelast": this.cmdDeleteLast(); break;
                 case "findlinks": this.cmdFindLinks(args); break;
                 case "showall": this.cmdShowAll(args); break;
-                default: this.sendMessage(cmdList["invalid"].help); break;
+                default: this.cmdHelp("invalid"); break;
             }
         }
     }
@@ -118,22 +118,18 @@ module.exports = class Cmd {
     //          ...
     //          You can use these commands here:
     //          !help, !cmd1, !cmd2, !cmd3...
-    cmdHelp(cmd) {
-        if(cmdList.hasOwnProperty(cmd)) {
-            if(cmdList[cmd].channels.includes(this.ch_type)) {
-                let out = this.getHelpOutput(cmd);
-                let list = ((cmd == 'help')? this.getCmdList():this.getRolesList(cmd));
-                for(let l in list) {
-                    out.push(list[l]);
-                }
-                this.sendMessage(out);
+    cmdHelp(cmd_in) {
+        let cmd = cmdList.hasOwnProperty(cmd_in)? cmd_in:'help';
+        if(cmdList[cmd].channels.includes(this.ch_type)) {
+            let out = this.getHelpOutput(cmd);
+            let list = ((cmd == 'help')? this.getCmdList():this.getRolesList(cmd));
+            for(let l in list) {
+                out.push(list[l]);
             }
-            else {
-                this.sendMessage(this.getCmdList());
-            }
+            this.sendMessage(out);
         }
         else {
-            this.sendMessage(this.cmdHelp('help'));
+            this.sendMessage(this.getCmdList());
         }
     }
     getHelpOutput(cmd) {
