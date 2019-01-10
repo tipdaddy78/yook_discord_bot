@@ -33,12 +33,17 @@ module.exports = class Cmd {
     parseInput() {
         if(this.content[0] == '!') {
             let cmd = this.content.substring(1).split(' ')[0];
-            let args = this.content.substring(1+cmd.length+1).toLowerCase().split(', ');
-            if(this.checkChannel(cmd)){
-                this.fetchCommand(cmd, args);
+            if(this.cmdExists(cmd)) {
+                let args = this.content.substring(1+cmd.length+1).toLowerCase().split(', ');
+                if(this.checkChannel(cmd)){
+                    this.fetchCommand(cmd, args);
+                }
+                else {
+                    this.reply(this.wrongChannel(cmd));
+                }
             }
             else {
-                this.reply(this.wrongChannel(cmd));
+                this.reply(cmdList.invalid.help);
             }
         }
     }
@@ -73,6 +78,14 @@ module.exports = class Cmd {
             }
         }
         return true;
+    }
+    cmdExists(cmd) {
+        for(let c in cmdList) {
+            if(c == cmd) {
+                return true;
+            }
+        }
+        return false
     }
     fetchCommand(cmd, args) {
         if(this.hasPermission(cmd,this.ch_type)) {

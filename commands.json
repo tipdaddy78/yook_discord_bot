@@ -2,7 +2,9 @@
     "invalid":{
         "roles":[],
         "channels":["dm","text"],
-        "help":["Command not found."]
+        "help":[
+            "Command not found.",
+            "Use `!help` for a list of commands."]
     },
     "help":{
         "roles":[],
