@@ -1,25 +1,38 @@
 {
     "invalid":{
         "roles":[],
-        "channels":["dm","text"],
+        "channels":["dm","text","group"],
+        "servers":[],
         "help":[
             "Command not found."]
     },
     "help":{
         "roles":[],
-        "channels":["dm","text"],
+        "channels":["dm","text","group"],
+        "servers":[],
         "help":[
             "```!help -command```"
-        ]
+        ],
+        "errors":{
+            "wrongch":"DM me !help for that command."
+        }
     },
     "addlink":{
-        "roles":["Mods","Admin","Testers","Runners"],
+        "roles":["Mods","Dev","Testers","Runners"],
         "channels":["text"],
+        "servers":[
+            "Yooka-Laylee Speedrunning",
+            "Ch1pset"
+        ],
         "help":[
             "```!addlink -link, -name, -tag1, -tag2, ...```",
             "-Links must start with \"http\"",
             "-Link names and tags may contain spaces, and are NOT case sensitive",
-            "-You may include as many tags as you want"
+            "Example:",
+            "```markdown",
+            "!addlink https://link, link name, first tag, second tag",
+            "Link added!",
+            "```"
         ],
         "confirm":{
             "added":"Link added!",
@@ -27,6 +40,7 @@
         },
         "errors":{
             "badlink":"Only links beginning with http or https allowed!",
+            "noedit":"Only OP can overwrite their own links!",
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",
                 "Separate arguments by a comma followed by a space: `-arg1, -arg2`",
@@ -36,11 +50,19 @@
     },
     "getlink":{
         "roles":[],
-        "channels":["dm","text"],
+        "channels":["text"],
+        "servers":[],
         "help":[
             "```!getlink -name```",
             "-Link names may contain spaces and are NOT case sensitive",
-            "-To search for links, DM me `!findlinks`"
+            "-To search for links, DM me `!findlinks` or `!filterlinks`",
+            "Example:",
+            "```markdown",
+            "!getlink link name",
+            "@user, https://your-link",
+            "tags: search tags,will show here,separated by commas",
+            "Posted by OP",
+            "```"
         ],
         "errors":{
             "notfound":"No link with that name",
@@ -48,8 +70,13 @@
         }
     },
     "deletelink":{
-        "roles":["Mods","Admin"],
+        "roles":["Mods","Dev"],
         "channels":["text"],
+        "servers":[],
+        "servers":[
+            "Yooka-Laylee Speedrunning",
+            "Ch1pset"
+        ],
         "help":[
             "```!deletelink -name```",
             "-Link names may contain spaces and are NOT case sensitive",
@@ -62,8 +89,12 @@
         }
     },
     "deletelast":{
-        "roles":["Mods","Admin"],
+        "roles":["Mods","Dev"],
         "channels":["text"],
+        "servers":[
+            "Yooka-Laylee Speedrunning",
+            "Ch1pset"
+        ],
         "help":[
             "```!deletelast```",
             "-This command cannot be undone, and takes effect immediately"
@@ -75,9 +106,20 @@
     },
     "findlinks":{
         "roles":[],
-        "channels":["dm"],
+        "channels":["dm","group"],
+        "servers":[],
         "help":[
             "```!findlinks -tag1, -tag2, ...```",
+            "-Findlinks will return links containing any of the search tags",
+            "Example:",
+            "```markdown",
+            "!findlinks any%, tricks",
+            "[trowser skip](https://link-to-vid) Posted by OP",
+            "[early waterworks](https://link-to-vid) Posted by OP",
+            "[any% wr](https://link-to-vid) Posted by OP",
+            "[any% w/flight wr](https://link-to-vid) Posted by OP",
+            "```",
+            "-Use !filterlinks for a more refined search",
             "-Tags may contain spaces, and are NOT case sensitive"
         ],
         "errors":{
@@ -87,9 +129,18 @@
     },
     "filterlinks":{
         "roles":[],
-        "channels":["dm"],
+        "channels":["dm","group"],
+        "servers":[],
         "help":[
             "```!filterlinks -tag1 -tag2 ... -tagN```",
+            "-Filterlinks will return links containing all of the search tags",
+            "Example:",
+            "```markdown",
+            "!filterlinks any%, tricks",
+            "[trowser skip](https://link-to-vid) Posted by OP",
+            "[early waterworks](https://link-to-vid) Posted by OP",
+            "```",
+            "Use !findlinks for a more general search",
             "-Tags may contain spaces and are NOT case sensitive"
         ],
         "errors":{
@@ -100,10 +151,10 @@
     "showall":{
         "roles":[],
         "channels":["dm"],
+        "servers":[],
         "help":[
             "```!showall -attribute```",
-            "-Valid attributes: `links`, `tags`",
-            "-Can only be used in a DM with me."
+            "-Valid attributes: `links`, `tags`"
         ],
         "errors":{
             "nodata":"Database is empty."

@@ -5,18 +5,22 @@ module.exports = class Database {
         this.db = json;
         this.filepath = filepath;
     }
-    add(name, data, tags, op) {
-        let flags = {"overwrite":false};
-        if(this.db[name]) {
-            flags.overwrite = true;
+    getEntry(key) {
+        return {key:this.db[key]};
+    }
+    addEntry(key, value) {
+        let flags = {"exists":false};
+        if(this.db[key]) {
+            flags.exists = true;
         }
-        this.db[name] = {
-            "data":data,
-            "tags":tags,
-            "op":op
-        };
-        this.updateDB();
+        else {
+            this.db[key] = value;
+            this.updateDB();
+        }
         return flags;
+    }
+    overwriteEntry(key, value) {
+        this.db[key] = value;
     }
     delete(name) {
         for(let o in this.db) {
@@ -38,39 +42,23 @@ module.exports = class Database {
         return last;
     }
     get(name) {
-        let out = null;
+        let out = [];
         for(let key in this.db) {
             if(name === key) {
-                out = this.db[name].data;
-                out += '\nTags: '
-                out += this.db[name].tags;
-                out += '\nPosted by ';
-                out += this.db[name].op;
+                out.push('[' + name + ']'
+                + '(' + this.db[name].data + ')'
+                + '\ntags: ' + this.db[name].tags
+                + '\nPosted by ' + this.db[name].op
+                );
             }
         }
         return out;
     }
-    getAllTags() {
-        let out = [];
+    getAll() {
+        let out = {};
         for(let key in this.db) {
-            for(let t in this.db[key].tags) {
-                if(!out.includes(this.db[key].tags[t])) {
-                    out.push(this.db[key].tags[t]);
-                }
-            }
+            out[key] = this.db[key];
         }
-        out.sort();
-        return out;
-    }
-    getAllData() {
-        let out = [];
-        for(let key in this.db) {
-            out.push('[' + key + ']'
-            + '(' + this.db[key].data + ')'
-            + ': Posted by ' + this.db[key].op);
-        }
-
-        out.sort();
         return out;
     }
     find(tags) {
@@ -78,12 +66,7 @@ module.exports = class Database {
         for(let key in this.db) {
             for(let i = 0; i < tags.length; i++) {
                 if(this.db[key].tags.includes(tags[i])) {
-                    out[key] = {
-                        "data":this.db[key].data,
-                        "tags":this.db[key].tags,
-                        "op":this.db[key].op
-                    };
-
+                    out[key] = this.db[key];
                 }
             }
         }
@@ -99,11 +82,7 @@ module.exports = class Database {
                 }
             }
             if(count == tags.length) {
-                out[key] = {
-                    "data":this.db[key].data,
-                    "tags":this.db[key].tags,
-                    "op":this.db[key].op
-                };
+                out[key] = this.db[key];
             }
         }
         return out;
