@@ -3,6 +3,13 @@ const Database = require('./database.js');
 const Fetch = require('./commands.js');
 const Parse = require('./parsehelper.js');
 const logger = require('winston');
+logger.remove(logger.transports.Console);
+logger.add(new logger.transports.Console,
+    {
+        colorize: true
+    }
+);
+logger.level = 'debug';
 var linksDB = require('./links.json');
 
 //Node.js export for use in other scripts
@@ -40,7 +47,7 @@ module.exports = class CmdParser extends EventEmitter {
     }
     set cmd(c)
     {
-        this.command = c.substring(1, c.indexOf(' '));
+        this.command = c.substring(1).split(' ')[0];
     }
     get cmd()
     {
@@ -48,10 +55,14 @@ module.exports = class CmdParser extends EventEmitter {
     }
     set args(a)
     {
-        this.arg_list = a.substring(a.indexOf(' ')).toLowerCase().split(',');
-        for(let i in this.arg_list)
+        this.arg_list = '';
+        if(a.substring(1) != this.cmd)
         {
-            this.arg_list[i] = this.arg_list[i].trim();
+            this.arg_list = a.substring(a.indexOf(' ')).toLowerCase().split(',');
+            for(let i in this.arg_list)
+            {
+                this.arg_list[i] = this.arg_list[i].trim();
+            }
         }
     }
     get args()
@@ -60,6 +71,8 @@ module.exports = class CmdParser extends EventEmitter {
     }
     fetchCommand(cmd, args)
     {
+        logger.log('info', 'Calling fetch command...');
+        logger.log('info', 'Argment list: ' + cmd + ' ' + args);
         switch(cmd)
         {
             case "help": Fetch.help(this, args[0]); break;

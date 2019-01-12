@@ -24,10 +24,10 @@ module.exports = class Fetch
     static help(e, a)
     {
         //checks if user inserted '!' before the command they're looking for help
-        let cmd = (a[0]=='!')?a.substring(1):a;
+        let cmd = (a)? ((a[0]=='!')?a.substring(1):a):'help';
         let out = ['Usage:'];
         let i = 0;
-        if(this.exists(cmd))
+        if(this.exists(cmd) && a)
         {
             for(let h of this.get(cmd).help)
             {
@@ -65,6 +65,7 @@ module.exports = class Fetch
     static addLink(e, a)
     {
         let cmd = 'addlink';
+        let msg = '';
         if(e.checkChannel(this.get(cmd)) && e.hasPermission(this.get(cmd)))
         {
             if(a.length >= 3)
@@ -73,7 +74,6 @@ module.exports = class Fetch
                 let name = a[1];
                 let tags = [];
                 let op = e.username;
-                let msg = '';
                 for(let i = 2; i < a.length; i++)
                 {
                     tags.push(a[i].toLowerCase());
@@ -206,11 +206,12 @@ module.exports = class Fetch
     //          link 2: https://b-link
     static findLinks(e, t)
     {
-        let cmd = '!findlinks';
+        let cmd = 'findlinks';
+        let out = '';
         if(t)
         {
             let links = e.db.find(t);
-            let out = Parse.links(links);
+            out = Parse.links(links);
             if(out.length > 0)
             {
                 out.sort();
@@ -235,11 +236,12 @@ module.exports = class Fetch
     //          link 2: https://b-link
     static filterLinks(e, t)
     {
-        let cmd = '!filterlinks';
+        let cmd = 'filterlinks';
+        let out = '';
         if(t)
         {
             let links = e.db.filter(t);
-            let out = Parse.links(links);
+            out = Parse.links(links);
             if(out.length > 0)
             {
                 out.sort();
@@ -265,7 +267,7 @@ module.exports = class Fetch
     //          Posted by usr
     //          ...
     static showAll(e, a) {
-        let cmd = '!showall';
+        let cmd = 'showall';
         let data = e.db.getAll();
         let out = [];
         if(a == 'links')
@@ -286,19 +288,19 @@ module.exports = class Fetch
                 }
             }
             out.sort();
+            if(out.length > 0)
+            {
+                e.emit('cmd', e.data, cmd, out, 'dm');
+            }
+            else
+            {
+                let msg = cmdList.showall.errors.nodata;
+                e.emit('err', e.data, cmd, msg, 'dm');
+            }
         }
         else
         {
-            Fetch.help(cmd);
-        }
-        if(out.length > 0)
-        {
-            e.emit('cmd', e.data, cmd, out, 'dm');
-        }
-        else
-        {
-            let msg = cmdList.showall.errors.nodata;
-            e.emit('err', e.data, cmd, msg, 'dm');
+            Fetch.help(e, cmd);
         }
     }
 }
