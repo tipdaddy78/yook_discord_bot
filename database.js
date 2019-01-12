@@ -1,5 +1,6 @@
 const fs = require('fs');
 
+//Database class represents a JSON file which may be read from and written to
 module.exports = class Database
 {
     constructor(filepath, json)
@@ -56,18 +57,8 @@ module.exports = class Database
     }
     get(name)
     {
-        let out = [];
-        for(let key in this.db)
-        {
-            if(name === key)
-            {
-                out.push('[' + name + ']'
-                + '(' + this.db[name].data + ')'
-                + '\ntags: ' + this.db[name].tags
-                + '\nPosted by ' + this.db[name].op
-                );
-            }
-        }
+        let out = {};
+        out[name] = this.db[name];
         return out;
     }
     getAll()
@@ -117,8 +108,9 @@ module.exports = class Database
     updateDB()
     {
         fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) =>
-        {
-            if(err) throw err;
-        });
+            {
+                if(err) throw err;
+            }
+        );
     }
 }

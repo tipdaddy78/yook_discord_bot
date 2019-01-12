@@ -15,6 +15,7 @@ logger.level = 'debug';
 var bot = new Discord.Client();
 var cmd = new CmdParser();
 
+//Event listener for when bot successfully logs on
 bot.on('ready', (evt) =>
     {
         logger.info('Connected');
@@ -22,7 +23,8 @@ bot.on('ready', (evt) =>
     }
 );
 
-
+//Event listener for anytime a message is posted in a channel that our bot
+//has access to. Don't worry, I'm not logging everyone's messages to the bot.
 bot.on('message', msg =>
     {
         cmd.data = msg;
@@ -30,6 +32,8 @@ bot.on('message', msg =>
     }
 );
 
+//Event listener for anytime a command is used. Output message gets sent to
+//proper channel here.
 cmd.on('cmd', (d, c, msg, ch) =>
     {
         logger.log('info', d.username + ' used ' + c);
@@ -37,6 +41,7 @@ cmd.on('cmd', (d, c, msg, ch) =>
     }
 );
 
+//Event listener for any errors thrown by a command.
 cmd.on('err', (d, c, msg, ch) =>
     {
         logger.log('info', c + ' threw an error:\n' + msg);
@@ -44,6 +49,7 @@ cmd.on('err', (d, c, msg, ch) =>
     }
 );
 
+//Utility function to select output channel for sending messages from the bot.
 function selectChannel(ch, d, msg)
 {
     switch(ch)

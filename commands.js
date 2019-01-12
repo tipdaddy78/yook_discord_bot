@@ -1,3 +1,4 @@
+const Parse = require('./parsehelper.js');
 const cmdList = require('./commands.json');
 
 module.exports = class Fetch
@@ -22,23 +23,24 @@ module.exports = class Fetch
     //          !help, !cmd1, !cmd2, !cmd3...
     static help(e, a)
     {
-        let cmd = 'help';
+        //checks if user inserted '!' before the command they're looking for help
+        let cmd = (a[0]=='!')?a.substring(1):a;
         let out = ['Usage:'];
         let i = 0;
-        if(this.exists(a))
+        if(this.exists(cmd))
         {
-            for(let h in this.get(a).help)
+            for(let h of this.get(cmd).help)
             {
-                out.push(this.get(a).help[h]);
+                out.push(h);
                 i = ++h;
             }
-            if(this.get(a).roles.length > 0)
+            if(this.get(cmd).roles.length > 0)
             {
                 out.push('You must have one of these roles: ');
-                out.push('`' + this.get(a).roles + '`');
+                out.push('`' + this.get(cmd).roles + '`');
             }
             out.push('This commands works in: ');
-            out.push(this.get(a).channels + ' channels');
+            out.push(this.get(cmd).channels + ' channels');
             out.push('List of commands:');
             let c_list = [];
             for(let c in cmdList)
@@ -49,11 +51,11 @@ module.exports = class Fetch
                 }
             }
             out.push(c_list);
-            e.emit('cmd', e.data, cmd, out, 'dm');
+            e.emit('cmd', e.data, 'help', out, 'dm');
         }
         else
         {
-            Fetch.help(e, 'help')
+            Fetch.help(e, 'help');
         }
     }
     //Addlink command will add a new link to a list of links associated
@@ -68,7 +70,7 @@ module.exports = class Fetch
             if(a.length >= 3)
             {
                 let link = a[0];
-                let name = a[1].toLowerCase();
+                let name = a[1];
                 let tags = [];
                 let op = e.username;
                 let msg = '';
@@ -134,7 +136,7 @@ module.exports = class Fetch
         let out = '';
         if(n)
         {
-            let out = e.db.get(n);
+            let out = Parse.links(e.db.get(n));
             if(out)
             {
                 e.emit('cmd', e.data, cmd, out, 're');
@@ -255,6 +257,13 @@ module.exports = class Fetch
             e.emit('err', e.data, cmd, out, 'dm');
         }
     }
+    //Returns all values of specified key, links or tags, from all items in the
+    //database. Links will return everything from teh database.
+    //Example:  !showall links
+    //          [link 1](https://link)
+    //          tags: tag 1, tag 2
+    //          Posted by usr
+    //          ...
     static showAll(e, a) {
         let cmd = '!showall';
         let data = e.db.getAll();
@@ -266,13 +275,13 @@ module.exports = class Fetch
         }
         else if (a == 'tags')
         {
-            for(let key in data)
+            for(let d of data)
             {
-                for(let t in data[key].tags)
+                for(let t of d.tags)
                 {
-                    if(!out.includes(data[key].tags[t]))
+                    if(!out.includes(t))
                     {
-                        out.push(data[key].tags[t]);
+                        out.push(t);
                     }
                 }
             }
@@ -291,21 +300,5 @@ module.exports = class Fetch
             let msg = cmdList.showall.errors.nodata;
             e.emit('err', e.data, cmd, msg, 'dm');
         }
-    }
-}
-
-
-class Parse
-{
-    static links(links)
-    {
-        let out = [];
-        for(let key in links)
-        {
-            out.push('[' + key + '](' + links[key].data
-                + ') Posted by ' + links[key].op
-                + '\ntags: ' + links[key].tags);
-        }
-        return out;
     }
 }

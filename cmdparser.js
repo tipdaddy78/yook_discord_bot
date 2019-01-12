@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 const Database = require('./database.js');
 const Fetch = require('./commands.js');
+const Parse = require('./parsehelper.js');
 const logger = require('winston');
 var linksDB = require('./links.json');
 
@@ -39,7 +40,7 @@ module.exports = class CmdParser extends EventEmitter {
     }
     set cmd(c)
     {
-        this.command = c.substring(1).split(' ')[0];
+        this.command = c.substring(1, c.indexOf(' '));
     }
     get cmd()
     {
@@ -48,15 +49,8 @@ module.exports = class CmdParser extends EventEmitter {
     set args(a)
     {
         this.arg_list = a.substring(a.indexOf(' ')).toLowerCase().split(',');
-        let symbols = "!@#$%^&*-_+=|?({[<>]}):;\"\'";
         for(let i in this.arg_list)
         {
-            if(symbols.includes(this.arg_list[i][0]))
-            {
-                this.arg_list[i] = symbols.includes(this.arg_list[i][1])?
-                    this.arg_list[i].substring(2)
-                    :this.arg_list[i].substring(1);
-            }
             this.arg_list[i] = this.arg_list[i].trim();
         }
     }
@@ -95,23 +89,20 @@ module.exports = class CmdParser extends EventEmitter {
     //Returns whether command is being used in proper channel type
     checkChannel(cmd)
     {
-        return cmd.channels.includes(this.ch_type)
+        return cmd.channels.includes(this.ch_type);
     }
     hasPermission(cmd)
     {
-        if(this.ch_type == 'text')
+        if(cmd.roles.length > 0)
         {
-            if(cmd.roles.length > 0)
+            for(let r of cmd.roles)
             {
-                for(let r in cmd.roles)
+                if(this.checkRole(r))
                 {
-                    if(this.checkRole(cmd.roles[r]))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
-                return false;
             }
+            return false;
         }
         return true;
     }

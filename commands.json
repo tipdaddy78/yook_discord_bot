@@ -11,7 +11,7 @@
         "channels":["dm","text","group"],
         "servers":[],
         "help":[
-            "```!help -command```"
+            "```!help command```"
         ],
         "errors":{
             "wrongch":"DM me !help for that command."
@@ -25,7 +25,7 @@
             "Ch1pset"
         ],
         "help":[
-            "```!addlink -link, -name, -tag1, -tag2, ...```",
+            "```!addlink link, name, tag1, tag2, ...```",
             "-Links must start with \"http\"",
             "-Link names and tags may contain spaces, and are NOT case sensitive",
             "Example:",
@@ -43,7 +43,7 @@
             "noedit":"Only OP can overwrite their own links!",
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",
-                "Separate arguments by a comma followed by a space: `-arg1, -arg2`",
+                "Separate arguments by a comma followed by a space: `arg1, arg2`",
                 "For more info, use `!help addlink`"
             ]
         }
@@ -53,9 +53,9 @@
         "channels":["text"],
         "servers":[],
         "help":[
-            "```!getlink -name```",
+            "```!getlink name```",
             "-Link names may contain spaces and are NOT case sensitive",
-            "-To search for links, DM me `!findlinks` or `!filterlinks`",
+            "-To search for links, use `!findlinks` or `!filterlinks`",
             "Example:",
             "```markdown",
             "!getlink link name",
@@ -65,7 +65,7 @@
             "```"
         ],
         "errors":{
-            "notfound":"No link with that name",
+            "notfound":"No link with that name. Use !findlinks or !filterlinks to search.",
             "noinput":"Please enter the name of the link to get"
         }
     },
@@ -78,7 +78,7 @@
             "Ch1pset"
         ],
         "help":[
-            "```!deletelink -name```",
+            "```!deletelink name```",
             "-Link names may contain spaces and are NOT case sensitive",
             "-This command cannot be undone, and takes effect immediately"
         ],
@@ -109,7 +109,7 @@
         "channels":["dm","group"],
         "servers":[],
         "help":[
-            "```!findlinks -tag1, -tag2, ...```",
+            "```!findlinks tag1, tag2, ...```",
             "-Findlinks will return links containing any of the search tags",
             "Example:",
             "```markdown",
@@ -132,7 +132,7 @@
         "channels":["dm","group"],
         "servers":[],
         "help":[
-            "```!filterlinks -tag1 -tag2 ... -tagN```",
+            "```!filterlinks tag1, tag2, ..., tagN```",
             "-Filterlinks will return links containing all of the search tags",
             "Example:",
             "```markdown",
@@ -153,7 +153,7 @@
         "channels":["dm"],
         "servers":[],
         "help":[
-            "```!showall -attribute```",
+            "```!showall attribute```",
             "-Valid attributes: `links`, `tags`"
         ],
         "errors":{
