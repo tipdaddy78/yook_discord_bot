@@ -6,7 +6,7 @@ module.exports = class Database {
         this.filepath = filepath;
     }
     getEntry(key) {
-        return {key:this.db[key]};
+        return this.db[key];
     }
     addEntry(key, value) {
         let flags = {"exists":false};
@@ -21,6 +21,7 @@ module.exports = class Database {
     }
     overwriteEntry(key, value) {
         this.db[key] = value;
+        this.updateDB();
     }
     delete(name) {
         for(let o in this.db) {
