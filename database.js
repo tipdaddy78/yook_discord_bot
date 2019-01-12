@@ -1,31 +1,41 @@
 const fs = require('fs');
 
-module.exports = class Database {
-    constructor(filepath, json) {
+module.exports = class Database
+{
+    constructor(filepath, json)
+    {
         this.db = json;
         this.filepath = filepath;
     }
-    getEntry(key) {
+    getEntry(key)
+    {
         return this.db[key];
     }
-    addEntry(key, value) {
+    addEntry(key, value)
+    {
         let flags = {"exists":false};
-        if(this.db[key]) {
+        if(this.db[key])
+        {
             flags.exists = true;
         }
-        else {
+        else
+        {
             this.db[key] = value;
             this.updateDB();
         }
         return flags;
     }
-    overwriteEntry(key, value) {
+    overwriteEntry(key, value)
+    {
         this.db[key] = value;
         this.updateDB();
     }
-    delete(name) {
-        for(let o in this.db) {
-            if(name === o) {
+    delete(name)
+    {
+        for(let o in this.db)
+        {
+            if(name === o)
+            {
                 delete this.db[name];
                 this.updateDB();
                 return true;
@@ -33,19 +43,24 @@ module.exports = class Database {
         }
         return false;
     }
-    deleteLast() {
+    deleteLast()
+    {
         let last = null;
-        for(let o in this.db) {
+        for(let o in this.db)
+        {
             last = o;
         }
         delete this.db[last];
         this.updateDB();
         return last;
     }
-    get(name) {
+    get(name)
+    {
         let out = [];
-        for(let key in this.db) {
-            if(name === key) {
+        for(let key in this.db)
+        {
+            if(name === key)
+            {
                 out.push('[' + name + ']'
                 + '(' + this.db[name].data + ')'
                 + '\ntags: ' + this.db[name].tags
@@ -55,41 +70,54 @@ module.exports = class Database {
         }
         return out;
     }
-    getAll() {
+    getAll()
+    {
         let out = {};
-        for(let key in this.db) {
+        for(let key in this.db)
+        {
             out[key] = this.db[key];
         }
         return out;
     }
-    find(tags) {
+    find(tags)
+    {
         let out = {};
-        for(let key in this.db) {
-            for(let i = 0; i < tags.length; i++) {
-                if(this.db[key].tags.includes(tags[i])) {
+        for(let key in this.db)
+        {
+            for(let i = 0; i < tags.length; i++)
+            {
+                if(this.db[key].tags.includes(tags[i]))
+                {
                     out[key] = this.db[key];
                 }
             }
         }
         return out;
     }
-    filter(tags) {
+    filter(tags)
+    {
         let out = {};
-        for(let key in this.db) {
+        for(let key in this.db)
+        {
             let count = 0;
-            for(let i = 0; i < tags.length; i++) {
-                if(this.db[key].tags.includes(tags[i])) {
+            for(let i = 0; i < tags.length; i++)
+            {
+                if(this.db[key].tags.includes(tags[i]))
+                {
                     count++;
                 }
             }
-            if(count == tags.length) {
+            if(count == tags.length)
+            {
                 out[key] = this.db[key];
             }
         }
         return out;
     }
-    updateDB() {
-        fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) => {
+    updateDB()
+    {
+        fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) =>
+        {
             if(err) throw err;
         });
     }
