@@ -1,16 +1,8 @@
 const Discord = require('discord.js');
 const CmdParser = require('./cmdparser.js');
-const logger = require('winston');
+const logger = require('./debug.js');
 const auth = require('./auth.json');
 
-// Configure logger settings
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console,
-    {
-        colorize: true
-    }
-);
-logger.level = 'debug';
 // Initialize Discord Bot
 var bot = new Discord.Client();
 var cmd = new CmdParser();
@@ -19,7 +11,7 @@ var cmd = new CmdParser();
 bot.on('ready', (evt) =>
     {
         logger.info('Connected');
-        logger.info('Logged in as: ' + bot.user);
+        logger.info('Logged in as: ' + bot.user.username);
     }
 );
 
@@ -34,29 +26,29 @@ bot.on('message', msg =>
 
 //Event listener for anytime a command is used. Output message gets sent to
 //proper channel here.
-cmd.on('cmd', (d, c, msg, ch) =>
+cmd.on('cmd', (e) =>
     {
-        logger.log('info', d.username + ' used ' + c);
-        selectChannel(ch, d, msg);
+        logger.info(e.data.username + ' used ' + e.cmd);
+        selectChannel(e.ch, e.data, e.out);
     }
 );
 
 //Event listener for any errors thrown by a command.
-cmd.on('err', (d, c, msg, ch) =>
+cmd.on('err', (e) =>
     {
-        logger.log('info', c + ' threw an error:\n' + msg);
-        selectChannel(ch, d, msg);
+        logger.info(e.cmd + ' threw an error for ' + e.data.username + ':' + e.err);
+        selectChannel(e.ch, e.data, e.out);
     }
 );
 
 //Utility function to select output channel for sending messages from the bot.
-function selectChannel(ch, d, msg)
+function selectChannel(c, d, o)
 {
-    switch(ch)
+    switch(c)
     {
-        case 'ch': d.channel.send(msg); break;
-        case 'dm': d.usr.send(msg); break;
-        case 're': d.msg.reply(msg); break;
+        case 'ch': d.channel.send(o); break;
+        case 're': d.msg.reply(o); break;
+        case 'dm': d.usr.send(o); break;
     }
 }
 

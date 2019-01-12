@@ -1,5 +1,6 @@
 const Parse = require('./parsehelper.js');
 const cmdList = require('./commands.json');
+const logger = require('./debug.js');
 
 module.exports = class Fetch
 {
@@ -51,7 +52,15 @@ module.exports = class Fetch
                 }
             }
             out.push(c_list);
-            e.emit('cmd', e.data, 'help', out, 'dm');
+            e.emit(
+                'cmd',
+                {
+                    'data':e.data,
+                    'ch':'dm',
+                    'out':out,
+                    'cmd':'help'
+                }
+            );
         }
         else
         {
@@ -90,7 +99,15 @@ module.exports = class Fetch
                     if(!flags.exists)
                     {
                         msg = cmdList.addlink.confirm.added;
-                        e.emit('cmd', e.data, cmd, msg, 're');
+                        e.emit(
+                            'cmd',
+                            {
+                                'data':e.data,
+                                'ch':'re',
+                                'out':msg,
+                                'cmd':cmd
+                            }
+                        );
                     }
                     else
                     {
@@ -104,25 +121,60 @@ module.exports = class Fetch
                                 }
                             );
                             msg = cmdList.addlink.confirm.overwrite;
-                            e.emit('cmd', e.data, cmd, msg, 're');
+                            e.emit(
+                                'cmd',
+                                {
+                                    'data':e.data,
+                                    'ch':'re',
+                                    'out':msg,
+                                    'cmd':cmd
+                                }
+                            );
                         }
                         else
                         {
                             msg = cmdList.addlink.errors.noedit;
-                            e.emit('err', e.data, cmd, msg, 're');
+                            e.emit(
+                                'err',
+                                {
+                                    'data':e.data,
+                                    'ch':'re',
+                                    'out':msg,
+                                    'cmd':cmd,
+                                    'err':'Insufficient Permissions'
+                                }
+                            );
                         }
                     }
                 }
                 else
                 {
                     msg = cmdList.addlink.errors.badlink;
-                    e.emit('err', e.data, cmd, msg, 're');
+                    e.emit(
+                        'err',
+                        {
+                            'data':e.data,
+                            'ch':'re',
+                            'out':msg,
+                            'cmd':cmd,
+                            'err':'Incorrect Input'
+                        }
+                    );
                 }
             }
             else
             {
                 msg = cmdList.addlink.errors.missingarg;
-                e.emit('err', e.data, cmd, msg, 're');
+                e.emit(
+                    'err',
+                    {
+                        'data':e.data,
+                        'ch':'re',
+                        'out':msg,
+                        'cmd':cmd,
+                        'err':'No Input'
+                    }
+                );
             }
         }
     }
@@ -139,18 +191,44 @@ module.exports = class Fetch
             let out = Parse.links(e.db.get(n));
             if(out)
             {
-                e.emit('cmd', e.data, cmd, out, 're');
+                e.emit(
+                    'cmd',
+                    {
+                        'data':e.data,
+                        'ch':'re',
+                        'out':out,
+                        'cmd':cmd,
+                    }
+                );
             }
             else
             {
                 out = cmdList.getlink.errors.notfound;
-                e.emit('cmd', e.data, cmd, out, 're');
+                e.emit(
+                    'err',
+                    {
+                        'data':e.data,
+                        'ch':'re',
+                        'out':out,
+                        'cmd':cmd,
+                        'err':'Not Found'
+                    }
+                );
             }
         }
         else
         {
             out = cmdList.getlink.errors.noinput;
-            e.emit('cmd', e.data, cmd, out, 're');
+            e.emit(
+                'err',
+                {
+                    'data':e.data,
+                    'ch':'re',
+                    'out':out,
+                    'cmd':cmd,
+                    'err':'Not Found'
+                }
+            );
         }
     }
     //Deletelink command deletes the link with specified name in the
@@ -167,16 +245,42 @@ module.exports = class Fetch
                 let d = e.db.delete(n);
                 if(d)
                 {
-                    e.emit('cmd', e.data, cmd, cmdList.deletelink.confirm, 're');
+                    e.emit(
+                        'cmd',
+                        {
+                            'data':e.data,
+                            'ch':'re',
+                            'out':cmdList.deletelink.confirm,
+                            'cmd':cmd
+                        }
+                    );
                 }
                 else
                 {
-                    e.emit('err', e.data, cmd, cmdList.deletelink.errors.notfound, 're');
+                    e.emit(
+                        'err',
+                        {
+                            'data':e.data,
+                            'ch':'re',
+                            'out':cmdList.deletelink.errors.notfound,
+                            'cmd':cmd,
+                            'err':'Not Found'
+                        }
+                    );
                 }
             }
             else
             {
-                e.emit('err', e.data, cmd, cmdList.deletelink.errors.noinput, 're');
+                e.emit(
+                    'err',
+                    {
+                        'data':e.data,
+                        'ch':'re',
+                        'out':cmdList.deletelink.errors.noinput,
+                        'cmd':cmd,
+                        'err':'No Input'
+                    }
+                );
             }
         }
     }
@@ -191,11 +295,28 @@ module.exports = class Fetch
             let d = e.db.deleteLast();
             if(d)
             {
-                e.emit('cmd', e.data, cmd, cmdList.deletelast.confirm, 're');
+                e.emit(
+                    'cmd',
+                    {
+                        'data':e.data,
+                        'ch':'re',
+                        'out':cmdList.deletelast.confirm,
+                        'cmd':cmd
+                    }
+                );
             }
             else
             {
-                e.emit('err', e.data, cmd, cmdList.deletelast.errors.nolinks, 're');
+                e.emit(
+                    'err',
+                    {
+                        'data':e.data,
+                        'ch':'re',
+                        'out':cmdList.deletelast.errors.nolinks,
+                        'cmd':cmd,
+                        'err':'No Input'
+                    }
+                );
             }
         }
     }
@@ -215,18 +336,44 @@ module.exports = class Fetch
             if(out.length > 0)
             {
                 out.sort();
-                e.emit('cmd', e.data, cmd, out, 'dm');
+                e.emit(
+                    'cmd',
+                    {
+                        'data':e.data,
+                        'ch':'dm',
+                        'out':out,
+                        'cmd':cmd
+                    }
+                );
             }
             else
             {
                 out = cmdList.findlinks.errors.nolinks;
-                e.emit('err', e.data, cmd, out, 'dm');
+                e.emit(
+                    'err',
+                    {
+                        'data':e.data,
+                        'ch':'dm',
+                        'out':out,
+                        'cmd':cmd,
+                        'err':'Not Found'
+                    }
+                )
             }
         }
         else
         {
             out = cmdList.findlinks.errors.notags;
-            e.emit('err', e.data, cmd, out, 'dm');
+            e.emit(
+                'err',
+                {
+                    'data':e.data,
+                    'ch':'dm',
+                    'out':out,
+                    'cmd':cmd,
+                    'err':'No Input'
+                }
+            )
         }
     }
     //Searches database for links containing ALL of the specified tags. This function
@@ -245,18 +392,44 @@ module.exports = class Fetch
             if(out.length > 0)
             {
                 out.sort();
-                e.emit('cmd', e.data, cmd, out, 'dm');
+                e.emit(
+                    'cmd',
+                    {
+                        'data':e.data,
+                        'ch':'dm',
+                        'out':out,
+                        'cmd':cmd
+                    }
+                );
             }
             else
             {
                 out = cmdList.filterlinks.errors.nolinks;
-                e.emit('err', e.data, cmd, out, 'dm');
+                e.emit(
+                    'err',
+                    {
+                        'data':e.data,
+                        'ch':'dm',
+                        'out':out,
+                        'cmd':cmd,
+                        'err':'Not Found'
+                    }
+                )
             }
         }
         else
         {
             out = cmdList.filterlinks.errors.notags;
-            e.emit('err', e.data, cmd, out, 'dm');
+            e.emit(
+                'err',
+                {
+                    'data':e.data,
+                    'ch':'dm',
+                    'out':out,
+                    'cmd':cmd,
+                    'err':'No Input'
+                }
+            )
         }
     }
     //Returns all values of specified key, links or tags, from all items in the
@@ -290,12 +463,29 @@ module.exports = class Fetch
             out.sort();
             if(out.length > 0)
             {
-                e.emit('cmd', e.data, cmd, out, 'dm');
+                e.emit(
+                    'cmd',
+                    {
+                        'data':e.data,
+                        'ch':'dm',
+                        'out':out,
+                        'cmd':cmd
+                    }
+                );
             }
             else
             {
-                let msg = cmdList.showall.errors.nodata;
-                e.emit('err', e.data, cmd, msg, 'dm');
+                out = cmdList.showall.errors.nodata;
+                e.emit(
+                    'err',
+                    {
+                        'data':e.data,
+                        'ch':'dm',
+                        'out':out,
+                        'cmd':cmd,
+                        'err':'Not Found'
+                    }
+                )
             }
         }
         else

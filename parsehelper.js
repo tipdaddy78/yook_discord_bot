@@ -1,3 +1,4 @@
+const logger = require('./debug.js');
 
 module.exports = class Parse
 {
