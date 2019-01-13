@@ -22,8 +22,7 @@ bot.on('ready', (evt) =>
 //has access to. Don't worry, I'm not logging everyone's messages to the bot.
 bot.on('message', msg =>
     {
-        cmd.data = msg;
-        cmd.parseInput();
+        cmd.input = msg;
     }
 );
 
@@ -61,4 +60,4 @@ function selectChannel(channel, data, output)
     }
 }
 
-bot.login(auth.token)
+bot.login(auth.token);

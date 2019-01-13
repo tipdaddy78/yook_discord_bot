@@ -29,9 +29,9 @@ class Logger
         return t.getFullYear() + '-'
             + (t.getMonth() + 1) + '-'
             + t.getDate() + '::'
-            + t.getHours() + ':'
-            + t.getMinutes() + ':'
-            + t.getSeconds();
+            + t.getHours().toString().padStart(2,'0') + ':'
+            + t.getMinutes().toString().padStart(2,'0') + ':'
+            + t.getSeconds().toString().padStart(2,'0');
     }
     info(msg)
     {
@@ -45,17 +45,13 @@ class Logger
     }
     log(msg)
     {
-        for(let l in this.loggers)
-        {
-            this.loggers[l].log(msg);
-        }
+        this.loggers.console.log(msg);
+        this.loggers.logfile.log(msg);
     }
     err(msg)
     {
-        for(let l in this.loggers)
-        {
-            this.loggers[l].error(msg);
-        }
+        this.loggers.console.error(msg);
+        this.loggers.logfile.error(msg);
     }
 }
 

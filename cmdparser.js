@@ -18,7 +18,6 @@ module.exports = class CmdParser extends EventEmitter {
     set data(msg)
     {
         this.msg = msg;
-        this.content = msg.content;
         this.usr = msg.author;
         this.username = msg.author.username;
         this.roles = (msg.member)? msg.member.roles:null;
@@ -38,43 +37,44 @@ module.exports = class CmdParser extends EventEmitter {
         }
         return d;
     }
-    set cmd(c)
-    {
-        this.command = c.substring(1).split(' ')[0];
-    }
-    get cmd()
-    {
-        return this.command;
-    }
     set args(a)
     {
-        this.arg_list = [];
-        if(a.substring(1) != this.cmd)
+        this.arg_list = {};
+        this.arg_list['cmd'] = a.substring(1).split(' ')[0].toLowerCase().split('-');
+        if(a.trim().includes(' '))
         {
-            this.arg_list = a.substring(a.indexOf(' ')).toLowerCase().split(',');
-            for(let i in this.arg_list)
+            this.arg_list['args'] = a.substring(a.indexOf(' ')+1).toLowerCase().split(',');
+            for(let a in this.arg_list['args'])
             {
-                this.arg_list[i] = this.arg_list[i].trim();
+                this.arg_list['args'][a] = this.arg_list['args'][a].trim();
             }
         }
+        else
+        {
+            this.arg_list['args'] = [];
+        }
+        logger.log('Args parsed: ' + JSON.stringify(this.arg_list));
     }
     get args()
     {
-        return this.arg_list;
+        return this.arg_list['args'];
     }
-    set opt(c)
+    get cmd()
     {
-        this.option = '';
-        if(c.includes('-'))
-        {
-            let dash_idx = c.indexOf('-');
-            this.option = c.substring(dash_idx + 1);
-            this.command = c.substring(0, dash_idx);
-        }
+        return this.arg_list['cmd'][0];
     }
     get opt()
     {
-        return this.option;
+        return this.arg_list['cmd'][1];
+    }
+    set input(msg)
+    {
+        this.data = msg;
+        if(msg.content[0]=='!')
+        {
+            this.args = msg.content;
+            this.fetchCommand(this.cmd, this.opt, this.args);
+        }
     }
     fetchCommand(cmd, opt, args)
     {
@@ -85,20 +85,8 @@ module.exports = class CmdParser extends EventEmitter {
             case "getlink": Fetch.getLink(this, args[0]); break;
             case "deletelink": Fetch.deleteLink(this, args[0]); break;
             case "deletelast": Fetch.deleteLast(this); break;
-            case "findlinks": Fetch.findLinks(this, args); break;
-            case "filterlinks": Fetch.filterLinks(this, args); break;
-            case "showall": Fetch.showAll(this, args[0]); break;
             case "find":Fetch.find(this, opt, args); break;
-        }
-    }
-    parseInput()
-    {
-        if(this.content.startsWith('!'))
-        {
-            this.cmd = this.content;
-            this.opt = this.cmd;
-            this.args = this.content;
-            this.fetchCommand(this.cmd, this.opt, this.args);
+            case "delete":Fetch.delete(this, opt, args); break;
         }
     }
     //Returns specified role of member if member contains it

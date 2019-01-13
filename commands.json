@@ -104,68 +104,18 @@
             "nolinks":"There are no links to delete."
         }
     },
-    "findlinks":{
-        "roles":[],
-        "channels":["dm","group"],
-        "servers":[],
-        "help":[
-            "```!findlinks tag1, tag2, ...```",
-            "-Findlinks will return links containing any of the search tags",
-            "Example:",
-            "```markdown",
-            "!findlinks any%, tricks",
-            "[trowser skip](https://link-to-vid) Posted by OP",
-            "[early waterworks](https://link-to-vid) Posted by OP",
-            "[any% wr](https://link-to-vid) Posted by OP",
-            "[any% w/flight wr](https://link-to-vid) Posted by OP",
-            "```",
-            "-Use !filterlinks for a more refined search",
-            "-Tags may contain spaces, and are NOT case sensitive"
-        ],
-        "errors":{
-            "nolinks":"No links found with those tags.",
-            "notags":"You must enter at least 1 tag to find."
-        }
-    },
-    "filterlinks":{
-        "roles":[],
-        "channels":["dm","group"],
-        "servers":[],
-        "help":[
-            "```!filterlinks tag1, tag2, ..., tagN```",
-            "-Filterlinks will return links containing all of the search tags",
-            "Example:",
-            "```markdown",
-            "!filterlinks any%, tricks",
-            "[trowser skip](https://link-to-vid) Posted by OP",
-            "[early waterworks](https://link-to-vid) Posted by OP",
-            "```",
-            "Use !findlinks for a more general search",
-            "-Tags may contain spaces and are NOT case sensitive"
-        ],
-        "errors":{
-            "nolinks":"No links with those tags.",
-            "notags":"Please enter at least 1 tag to filter."
-        }
-    },
-    "showall":{
-        "roles":[],
-        "channels":["dm"],
-        "servers":[],
-        "help":[
-            "```!showall attribute```",
-            "-Valid attributes: `links`, `tags`"
-        ],
-        "errors":{
-            "nodata":"Database is empty."
-        }
-    },
     "find":{
         "roles":[],
         "channels":["dm"],
         "servers":[],
         "help":[
-            "```!find-option keyword 1, keyword 2, ..., last keyword```"
+            "```!find keyword 1, keyword 2, ..., last keyword```",
+            "-Find will return any links whose names or tags contain any of the keyword terms",
+            "-Keyword terms may have spaces, but this will limit your search\n",
+            "**Options**",
+            "`!find-links` or `!find-link` or `!find-l` may be used optionally to specify a search for links",
+            "`!find-tags` or `!find-tag` or `!find-t` may be used to optionally specify a search for tags",
+            "*Note: If no keywords are entered in !find-tags, Find will return all tags from all links*\n"
         ],
         "errors":{
             "notfound":"No results. Make sure to separate each keyword with a comma to expand search."

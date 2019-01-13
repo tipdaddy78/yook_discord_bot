@@ -66,42 +66,6 @@ module.exports = class Database
         this.updateDB();
         return last;
     }
-    find(tags)
-    {
-        let out = {};
-        for(let key in this.db)
-        {
-            for(let t of tags)
-            {
-                if(this.db[key].tags.includes(t)
-                    || key.includes(t))
-                {
-                    out[key] = this.db[key];
-                }
-            }
-        }
-        return out;
-    }
-    filter(tags)
-    {
-        let out = {};
-        for(let key in this.db)
-        {
-            let count = 0;
-            for(let i = 0; i < tags.length; i++)
-            {
-                if(this.db[key].tags.includes(tags[i]))
-                {
-                    count++;
-                }
-            }
-            if(count == tags.length)
-            {
-                out[key] = this.db[key];
-            }
-        }
-        return out;
-    }
     updateDB()
     {
         fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) =>
