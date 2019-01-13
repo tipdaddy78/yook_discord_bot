@@ -3,3 +3,5 @@ package.json
 package-lock.json
 links.json
 node_modules/
+inept.log
+crash.log

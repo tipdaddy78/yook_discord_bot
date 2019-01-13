@@ -159,5 +159,13 @@
         "errors":{
             "nodata":"Database is empty."
         }
+    },
+    "find":{
+        "roles":[],
+        "channels":["dm"],
+        "servers":[],
+        "help":[
+            "```!find-option keyword 1, keyword 2, ..., last keyword```"
+        ]
     }
 }

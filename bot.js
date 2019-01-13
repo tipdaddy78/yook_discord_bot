@@ -1,6 +1,10 @@
+/*
+ *  Collection of event listenters for bot operation.
+ */
+
 const Discord = require('discord.js');
 const CmdParser = require('./cmdparser.js');
-const logger = require('./debug.js');
+const logger = require('./logger.js');
 const auth = require('./auth.json');
 
 // Initialize Discord Bot
@@ -10,8 +14,7 @@ var cmd = new CmdParser();
 //Event listener for when bot successfully logs on
 bot.on('ready', (evt) =>
     {
-        logger.info('Connected');
-        logger.info('Logged in as: ' + bot.user.username);
+        logger.info('Connected: Logged in as:' + bot.user.username + ' id:' + bot.user.id);
     }
 );
 
@@ -42,13 +45,13 @@ cmd.on('err', (e) =>
 );
 
 //Utility function to select output channel for sending messages from the bot.
-function selectChannel(c, d, o)
+function selectChannel(channel, data, output)
 {
-    switch(c)
+    switch(channel)
     {
-        case 'ch': d.channel.send(o); break;
-        case 're': d.msg.reply(o); break;
-        case 'dm': d.usr.send(o); break;
+        case 'ch': data.channel.send(output); break;
+        case 're': data.msg.reply(output); break;
+        case 'dm': data.usr.send(output); break;
     }
 }
 

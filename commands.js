@@ -1,6 +1,6 @@
 const Parse = require('./parsehelper.js');
 const cmdList = require('./commands.json');
-const logger = require('./debug.js');
+const logger = require('./logger.js');
 
 module.exports = class Fetch
 {
@@ -25,7 +25,10 @@ module.exports = class Fetch
     static help(e, a)
     {
         //checks if user inserted '!' before the command they're looking for help
-        let cmd = (a)? ((a[0]=='!')?a.substring(1):a):'help';
+        let cmd = (a)?
+            ((a[0]=='!')?
+                a.substring(1) : a)
+            :'help';
         let out = ['Usage:'];
         let i = 0;
         if(this.exists(cmd) && a)
@@ -185,11 +188,11 @@ module.exports = class Fetch
     static getLink(e, n)
     {
         let cmd = 'getlink';
-        let out = '';
+        let out = [];
         if(n)
         {
             let out = Parse.links(e.db.get(n));
-            if(out)
+            if(out.length > 0)
             {
                 e.emit(
                     'cmd',
@@ -439,28 +442,27 @@ module.exports = class Fetch
     //          tags: tag 1, tag 2
     //          Posted by usr
     //          ...
-    static showAll(e, a) {
+    static showAll(e, a)
+    {
         let cmd = 'showall';
         let data = e.db.getAll();
         let out = [];
         if(a == 'links')
         {
             out = Parse.links(data);
-            out.sort();
+            e.emit(
+                'cmd',
+                {
+                    'data':e.data,
+                    'ch':'dm',
+                    'out':out,
+                    'cmd':cmd
+                }
+            );
         }
         else if (a == 'tags')
         {
-            for(let d of data)
-            {
-                for(let t of d.tags)
-                {
-                    if(!out.includes(t))
-                    {
-                        out.push(t);
-                    }
-                }
-            }
-            out.sort();
+            out = Parse.tags(data);
             if(out.length > 0)
             {
                 e.emit(
@@ -491,6 +493,16 @@ module.exports = class Fetch
         else
         {
             Fetch.help(e, cmd);
+        }
+    }
+    static find(e, opt, args)
+    {
+        let cmd = 'search';
+        logger.info('Performing search');
+        switch(opt)
+        {
+            case 'links': break;
+            case 'tags': break;
         }
     }
 }

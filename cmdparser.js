@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 const Database = require('./database.js');
 const Fetch = require('./commands.js');
 const Parse = require('./parsehelper.js');
-const logger = require('./debug.js');
+const logger = require('./logger.js');
 var linksDB = require('./links.json');
 
 //Node.js export for use in other scripts
@@ -41,6 +41,7 @@ module.exports = class CmdParser extends EventEmitter {
     set cmd(c)
     {
         this.command = c.substring(1).split(' ')[0];
+        this.opt = this.command;
     }
     get cmd()
     {
@@ -62,10 +63,22 @@ module.exports = class CmdParser extends EventEmitter {
     {
         return this.arg_list;
     }
-    fetchCommand(cmd, args)
+    set opt(c)
     {
-        logger.info('Calling fetch command...');
-        logger.info('Argment list: ' + cmd + ' ' + args);
+        this.option = '';
+        if(c.includes('-'))
+        {
+            let dash_idx = c.indexOf('-');
+            this.option = c.substring(dash_idx);
+            this.command = c.substring(0, dash_idx);
+        }
+    }
+    get opt()
+    {
+        return this.option;
+    }
+    fetchCommand(cmd, opt, args)
+    {
         switch(cmd)
         {
             case "help": Fetch.help(this, args[0]); break;
@@ -76,15 +89,16 @@ module.exports = class CmdParser extends EventEmitter {
             case "findlinks": Fetch.findLinks(this, args); break;
             case "filterlinks": Fetch.filterLinks(this, args); break;
             case "showall": Fetch.showAll(this, args[0]); break;
+            case "search":Fetch.find(this, opt, args); break;
         }
     }
     parseInput()
     {
-        if(this.content[0] == '!')
+        if(this.content.startsWith('!'))
         {
             this.cmd = this.content;
             this.args = this.content;
-            this.fetchCommand(this.cmd, this.args);
+            this.fetchCommand(this.cmd, this.opt, this.args);
         }
     }
     //Returns specified role of member if member contains it
