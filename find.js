@@ -31,14 +31,6 @@ module.exports = class Find
     static tags(db, keywds)
     {
         let out = [];
-        if(keywds.length == 0)
-        {
-            logger.log('Searching for all tags');
-        }
-        else
-        {
-            logger.log('Searching for tags: ' + keywds.toString());
-        }
         for(let k in db)
         {
             for(let t of db[k].tags)

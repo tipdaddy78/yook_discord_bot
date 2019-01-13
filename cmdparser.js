@@ -28,12 +28,15 @@ module.exports = class CmdParser extends EventEmitter {
     {
         let d =
         {
-            "msg":this.msg,
-            "usr":this.usr,
-            "username":this.username,
-            "roles":this.roles,
-            "channel":this.channel,
-            "ch_type":this.ch_type
+            msg:this.msg,
+            usr:this.usr,
+            username:this.username,
+            roles:this.roles,
+            channel:this.channel,
+            ch_type:this.ch_type,
+            cmd:this.cmd,
+            opt:this.opt,
+            args:this.args
         }
         return d;
     }
@@ -53,7 +56,6 @@ module.exports = class CmdParser extends EventEmitter {
         {
             this.arg_list['args'] = [];
         }
-        logger.log('Args parsed: ' + JSON.stringify(this.arg_list));
     }
     get args()
     {

@@ -328,9 +328,11 @@ module.exports = class Fetch
     {
         let command = 'find';
         let output = [];
-        logger.info('Searching for ' + args);
         switch(opt)
         {
+            case 'help': case 'h':
+            return this.help(e, command); break;
+            break;
             case 'tags': case 'tag': case 't':
             output = Find.tags(e.db.all, args);
             break;
