@@ -41,7 +41,6 @@ module.exports = class CmdParser extends EventEmitter {
     set cmd(c)
     {
         this.command = c.substring(1).split(' ')[0];
-        this.opt = this.command;
     }
     get cmd()
     {
@@ -49,7 +48,7 @@ module.exports = class CmdParser extends EventEmitter {
     }
     set args(a)
     {
-        this.arg_list = '';
+        this.arg_list = [];
         if(a.substring(1) != this.cmd)
         {
             this.arg_list = a.substring(a.indexOf(' ')).toLowerCase().split(',');
@@ -69,7 +68,7 @@ module.exports = class CmdParser extends EventEmitter {
         if(c.includes('-'))
         {
             let dash_idx = c.indexOf('-');
-            this.option = c.substring(dash_idx);
+            this.option = c.substring(dash_idx + 1);
             this.command = c.substring(0, dash_idx);
         }
     }
@@ -89,7 +88,7 @@ module.exports = class CmdParser extends EventEmitter {
             case "findlinks": Fetch.findLinks(this, args); break;
             case "filterlinks": Fetch.filterLinks(this, args); break;
             case "showall": Fetch.showAll(this, args[0]); break;
-            case "search":Fetch.find(this, opt, args); break;
+            case "find":Fetch.find(this, opt, args); break;
         }
     }
     parseInput()
@@ -97,6 +96,7 @@ module.exports = class CmdParser extends EventEmitter {
         if(this.content.startsWith('!'))
         {
             this.cmd = this.content;
+            this.opt = this.cmd;
             this.args = this.content;
             this.fetchCommand(this.cmd, this.opt, this.args);
         }

@@ -1,4 +1,5 @@
 const Parse = require('./parsehelper.js');
+const Find = require('./find.js');
 const cmdList = require('./commands.json');
 const logger = require('./logger.js');
 
@@ -445,7 +446,7 @@ module.exports = class Fetch
     static showAll(e, a)
     {
         let cmd = 'showall';
-        let data = e.db.getAll();
+        let data = e.db.all;
         let out = [];
         if(a == 'links')
         {
@@ -497,12 +498,43 @@ module.exports = class Fetch
     }
     static find(e, opt, args)
     {
-        let cmd = 'search';
-        logger.info('Performing search');
+        let command = 'find';
+        let output = [];
+        logger.info('Searching for ' + opt);
         switch(opt)
         {
-            case 'links': break;
-            case 'tags': break;
+            case 'links':
+            output = Parse.links(Find.links(e.db.all, args));
+            break;
+            case 'tags':
+            output = Find.tags(e.db.all, args);
+            break;
+        }
+        if(output.length > 0)
+        {
+            e.emit(
+                'cmd',
+                {
+                    data:e.data,
+                    ch:'dm',
+                    out:output,
+                    cmd:command
+                }
+            );
+        }
+        else
+        {
+            output = cmdList.find.errors.notfound;
+            e.emit(
+                'err',
+                {
+                    data:e.data,
+                    ch:'dm',
+                    out:output,
+                    cmd:command,
+                    err:'No results'
+                }
+            );
         }
     }
 }

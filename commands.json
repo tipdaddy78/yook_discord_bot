@@ -166,6 +166,9 @@
         "servers":[],
         "help":[
             "```!find-option keyword 1, keyword 2, ..., last keyword```"
-        ]
+        ],
+        "errors":{
+            "notfound":"No results. Make sure to separate each keyword with a comma to expand search."
+        }
     }
 }

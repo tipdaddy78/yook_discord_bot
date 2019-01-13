@@ -44,6 +44,12 @@ cmd.on('err', (e) =>
     }
 );
 
+process.on('uncaughtException', msg =>
+    {
+        logger.error(msg);
+    }
+);
+
 //Utility function to select output channel for sending messages from the bot.
 function selectChannel(channel, data, output)
 {

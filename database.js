@@ -9,9 +9,19 @@ module.exports = class Database
         this.db = json;
         this.filepath = filepath;
     }
+    get all()
+    {
+        return this.db;
+    }
     getEntry(key)
     {
         return this.db[key];
+    }
+    get(name)
+    {
+        let out = {};
+        out[name] = this.db[name];
+        return out;
     }
     addEntry(key, value)
     {
@@ -56,29 +66,15 @@ module.exports = class Database
         this.updateDB();
         return last;
     }
-    get(name)
-    {
-        let out = {};
-        out[name] = this.db[name];
-        return out;
-    }
-    getAll()
-    {
-        let out = {};
-        for(let key in this.db)
-        {
-            out[key] = this.db[key];
-        }
-        return out;
-    }
     find(tags)
     {
         let out = {};
         for(let key in this.db)
         {
-            for(let i = 0; i < tags.length; i++)
+            for(let t of tags)
             {
-                if(this.db[key].tags.includes(tags[i]))
+                if(this.db[key].tags.includes(t)
+                    || key.includes(t))
                 {
                     out[key] = this.db[key];
                 }

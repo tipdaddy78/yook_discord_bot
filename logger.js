@@ -35,14 +35,26 @@ class Logger
     }
     info(msg)
     {
-        var out = {timestamp:this.timestamp,message:msg}
+        var out = {timestamp:this.timestamp,message:msg};
         this.log(out);
+    }
+    error(msg)
+    {
+        var out = {timestamp:this.timestamp,message:msg};
+        this.err(out);
     }
     log(msg)
     {
         for(let l in this.loggers)
         {
             this.loggers[l].log(msg);
+        }
+    }
+    err(msg)
+    {
+        for(let l in this.loggers)
+        {
+            this.loggers[l].error(msg);
         }
     }
 }
