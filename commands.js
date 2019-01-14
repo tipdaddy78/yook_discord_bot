@@ -1,18 +1,67 @@
+const DB = require('./database.js');
 const Parse = require('./parsehelper.js');
 const Find = require('./find.js');
+const Del = require('./delete.js');
+const Add = require('./add.js');
 const cmdList = require('./commands.json');
 const logger = require('./logger.js');
 
-module.exports = class Fetch
+module.exports = Commands;
+
+class Command
 {
-    static exists(cmd)
+    constructor(cmd_str)
     {
-        return cmdList.hasOwnProperty(cmd);
+        this.cmd_str = cmd_str;
     }
-    static get(cmd)
+    exists()
     {
-        return cmdList[cmd];
+        return cmdList.hasOwnProperty(this.cmd_str);
     }
+    get()
+    {
+        return cmdList[cmd_str];
+    }
+    static list()
+    {
+        let out = [];
+        for(let c in cmdList)
+        {
+            if(cmdList[c]!='invalid')
+            {
+                out.push('!' + cmdList[c]);
+            }
+        }
+        return out;
+    }
+    get str()
+    {
+        return this.cmd_str;
+    }
+    get help()
+    {
+        return cmdList[cmd_str].help;
+    }
+    get channels()
+    {
+        return cmdList[cmd_str].channels;
+    }
+    get roles()
+    {
+        return cmdList[cmd_str].roles;
+    }
+    get servers()
+    {
+        return cmdList[cmd_str].servers;
+    }
+    get message(msg)
+    {
+        return cmdList[cmd_str].output[msg];
+    }
+}
+
+class Fetch
+{
     //Help command will provide information for specified commands.
     //Example:  !help
     //          @user !help [cmd]
@@ -25,44 +74,31 @@ module.exports = class Fetch
     //          !help, !cmd1, !cmd2, !cmd3...
     static help(e, a)
     {
-        //checks if user inserted '!' before the command they're looking for help
-        let cmd = (a)?
-            ((a[0]=='!')?
-                a.substring(1) : a)
-            :'help';
+        let cmd = new Command(a?(a[0]=='!'?a.substring(1):a):'help');
         let out = ['Usage:'];
         let i = 0;
-        if(this.exists(cmd) && a)
+        if(cmd.exists())
         {
-            for(let h of this.get(cmd).help)
+            for(let h of cmd.help)
             {
                 out.push(h);
                 i = ++h;
             }
-            if(this.get(cmd).roles.length > 0)
+            if(cmd.roles.length > 0)
             {
                 out.push('You must have one of these roles: ');
-                out.push('`' + this.get(cmd).roles + '`');
+                out.push('`' + cmd.roles + '`');
             }
             out.push('This commands works in: ');
-            out.push(this.get(cmd).channels + ' channels');
+            out.push(cmd.channels + ' channels');
             out.push('List of commands:');
-            let c_list = [];
-            for(let c in cmdList)
-            {
-                if(c != 'invalid')
-                {
-                    c_list.push('!' + c);
-                }
-            }
-            out.push(c_list);
+            out.push(Command.list());
             e.emit(
                 'cmd',
                 {
                     'data':e.data,
                     'ch':'dm',
-                    'out':out,
-                    'cmd':'help'
+                    'out':out
                 }
             );
         }
@@ -71,268 +107,14 @@ module.exports = class Fetch
             Fetch.help(e, 'help');
         }
     }
-    //Addlink command will add a new link to a list of links associated
-    //with a name in an xml doc
-    //Example:  !addlink meme https://dank.meme
-    //          Your link has been added!
-    static addLink(e, a)
-    {
-        let cmd = 'addlink';
-        let msg = '';
-        if(e.checkChannel(this.get(cmd)) && e.hasPermission(this.get(cmd)))
-        {
-            if(a.length >= 3)
-            {
-                let link = a[0];
-                let name = a[1];
-                let tags = [];
-                let op = e.username;
-                for(let i = 2; i < a.length; i++)
-                {
-                    tags.push(a[i].toLowerCase());
-                }
-                if(link.substring(0,4) == "http")
-                {
-                    let flags = e.db.addEntry(name,
-                        {
-                            "data":link,
-                            "tags":tags,
-                            "op":op
-                        }
-                    );
-                    if(!flags.exists)
-                    {
-                        msg = cmdList.addlink.confirm.added;
-                        e.emit(
-                            'cmd',
-                            {
-                                'data':e.data,
-                                'ch':'re',
-                                'out':msg,
-                                'cmd':cmd
-                            }
-                        );
-                    }
-                    else
-                    {
-                        if(e.db.getEntry(name).op == op)
-                        {
-                            e.db.overwriteEntry(name,
-                                {
-                                    "data":link,
-                                    "tags":tags,
-                                    "op":op
-                                }
-                            );
-                            msg = cmdList.addlink.confirm.overwrite;
-                            e.emit(
-                                'cmd',
-                                {
-                                    'data':e.data,
-                                    'ch':'re',
-                                    'out':msg,
-                                    'cmd':cmd
-                                }
-                            );
-                        }
-                        else
-                        {
-                            msg = cmdList.addlink.errors.noedit;
-                            e.emit(
-                                'err',
-                                {
-                                    'data':e.data,
-                                    'ch':'re',
-                                    'out':msg,
-                                    'cmd':cmd,
-                                    'err':'Insufficient Permissions'
-                                }
-                            );
-                        }
-                    }
-                }
-                else
-                {
-                    msg = cmdList.addlink.errors.badlink;
-                    e.emit(
-                        'err',
-                        {
-                            'data':e.data,
-                            'ch':'re',
-                            'out':msg,
-                            'cmd':cmd,
-                            'err':'Incorrect Input'
-                        }
-                    );
-                }
-            }
-            else
-            {
-                msg = cmdList.addlink.errors.missingarg;
-                e.emit(
-                    'err',
-                    {
-                        'data':e.data,
-                        'ch':'re',
-                        'out':msg,
-                        'cmd':cmd,
-                        'err':'No Input'
-                    }
-                );
-            }
-        }
-    }
-    //Getlink command will reply to user the exact link with the specified
-    //key/name provided in argument list
-    //Example:  !getlink meme
-    //          @user, https://dank.meme
-    static getLink(e, n)
-    {
-        let cmd = 'getlink';
-        let out = [];
-        if(n)
-        {
-            let out = Parse.links(e.db.get(n));
-            if(out.length > 0)
-            {
-                e.emit(
-                    'cmd',
-                    {
-                        'data':e.data,
-                        'ch':'re',
-                        'out':out,
-                        'cmd':cmd,
-                    }
-                );
-            }
-            else
-            {
-                out = cmdList.getlink.errors.notfound;
-                e.emit(
-                    'err',
-                    {
-                        'data':e.data,
-                        'ch':'re',
-                        'out':out,
-                        'cmd':cmd,
-                        'err':'Not Found'
-                    }
-                );
-            }
-        }
-        else
-        {
-            out = cmdList.getlink.errors.noinput;
-            e.emit(
-                'err',
-                {
-                    'data':e.data,
-                    'ch':'re',
-                    'out':out,
-                    'cmd':cmd,
-                    'err':'Not Found'
-                }
-            );
-        }
-    }
-    //Deletelink command deletes the link with specified name in the
-    //links.json file
-    //Example:  !deletelink meme
-    //          @user, Successfully deleted link.
-    static deleteLink(e, n)
-    {
-        let cmd = 'deletelink';
-        if(e.checkChannel(this.get(cmd)) && e.hasPermission(this.get(cmd)))
-        {
-            if(n)
-            {
-                let d = e.db.delete(n);
-                if(d)
-                {
-                    e.emit(
-                        'cmd',
-                        {
-                            'data':e.data,
-                            'ch':'re',
-                            'out':cmdList.deletelink.confirm,
-                            'cmd':cmd
-                        }
-                    );
-                }
-                else
-                {
-                    e.emit(
-                        'err',
-                        {
-                            'data':e.data,
-                            'ch':'re',
-                            'out':cmdList.deletelink.errors.notfound,
-                            'cmd':cmd,
-                            'err':'Not Found'
-                        }
-                    );
-                }
-            }
-            else
-            {
-                e.emit(
-                    'err',
-                    {
-                        'data':e.data,
-                        'ch':'re',
-                        'out':cmdList.deletelink.errors.noinput,
-                        'cmd':cmd,
-                        'err':'No Input'
-                    }
-                );
-            }
-        }
-    }
-    //Deletelast command deletes last link in the links.json file
-    //Example:  !deletelast
-    //          @user, Successfully deleted last link.
-    static deleteLast(e)
-    {
-        let cmd = 'deletelast'
-        if(e.checkChannel(this.get(cmd)) && e.hasPermission(this.get(cmd)))
-        {
-            let d = e.db.deleteLast();
-            if(d)
-            {
-                e.emit(
-                    'cmd',
-                    {
-                        'data':e.data,
-                        'ch':'re',
-                        'out':cmdList.deletelast.confirm,
-                        'cmd':cmd
-                    }
-                );
-            }
-            else
-            {
-                e.emit(
-                    'err',
-                    {
-                        'data':e.data,
-                        'ch':'re',
-                        'out':cmdList.deletelast.errors.nolinks,
-                        'cmd':cmd,
-                        'err':'No Input'
-                    }
-                );
-            }
-        }
-    }
     static find(e, opt, args)
     {
-        let command = 'find';
         let output = [];
+        let cmd = new Command(e.data.cmd);
         switch(opt)
         {
             case 'help': case 'h':
-            return this.help(e, command); break;
-            break;
+            return this.help(e, cmd.str);
             case 'tags': case 'tag': case 't':
             output = Find.tags(e.db.all, args);
             break;
@@ -340,31 +122,78 @@ module.exports = class Fetch
             output = Find.links(e.db.all, args);
             break;
         }
-        if(output.length > 0)
+        if(output.length == 0)
         {
-            e.emit(
-                'cmd',
-                {
-                    data:e.data,
-                    ch:'dm',
-                    out:output,
-                    cmd:command
-                }
-            );
+            output = cmd.message('notfound');
+        }
+        e.emit('cmd',
+            {
+                data:e.data,
+                ch:'dm',
+                out:output
+            }
+        );
+    }
+    static delete(e, opt, args)
+    {
+        let cmd = new Command(e.data.cmd);
+        let output = '';
+        if(e.checkChannel(cmd.get())
+            && e.hasPermission(cmd.get()))
+        {
+            switch(opt)
+            {
+                case 'help': case 'h':
+                return this.help(e, cmd.str);
+                case 'tag': case 't':
+                output = Del.tag(e.db, e.data.username, args[0], args[1]);
+                break;
+                case 'link': case 'l': default:
+                output = Del.link(e.db, e.data.username, args[0]);
+                break;
+            }
         }
         else
         {
-            output = cmdList.find.errors.notfound;
-            e.emit(
-                'err',
-                {
-                    data:e.data,
-                    ch:'dm',
-                    out:output,
-                    cmd:command,
-                    err:'No results'
-                }
-            );
+            output = 'nopermit';
         }
+        return e.emit('cmd',
+            {
+                data:e.data,
+                ch:'re',
+                out:cmd.message(output);
+            }
+        );
+    }
+    static add(e, opt, args)
+    {
+        let cmd = new Command(e.data.cmd);
+        let output = '';
+        if(e.checkChannel(cmd.get())
+            && e.hasPermission(cmd.get()))
+        {
+            switch(opt)
+            {
+                case 'help': case 'h':
+                return this.help(e, cmd.str);
+                case 'tags': case 'tag': case 't':
+                output = Add.tag(e.db, e.data.username, args);
+                break;
+                case 'link': case 'l': default:
+                output = Add.link(e.db, e.data.username, args);
+                break;
+            }
+        }
+        else
+        {
+            output = 'nopermit';
+        }
+        return e.emit('cmd',
+            {
+                data:e.data,
+                ch:'re',
+                out:cmd.message(output)
+            }
+        );
     }
 }

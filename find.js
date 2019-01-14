@@ -37,11 +37,15 @@ module.exports = class Find
             {
                 for(let w of keywds)
                 {
-                    if((keywds.length==0 || t.includes(w))
+                    if((t.includes(w))
                         && !out.includes(t))
                     {
                         out.push(t);
                     }
+                }
+                if(keywds.length == 0)
+                {
+                    out.push(t);
                 }
             }
         }

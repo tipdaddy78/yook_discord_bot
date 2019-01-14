@@ -1,6 +1,8 @@
 const fs = require('fs');
 const logger = require('./logger.js');
 
+const Flags = {DNE:0,EXISTS:1,OVERWRITE:2};
+
 //Database class represents a JSON file which may be read from and written to
 module.exports = class Database
 {
@@ -25,22 +27,22 @@ module.exports = class Database
     }
     addEntry(key, value)
     {
-        let flags = {"exists":false};
         if(this.db[key])
         {
-            flags.exists = true;
+            return Flags.EXISTS;
         }
         else
         {
             this.db[key] = value;
             this.updateDB();
+            return Flags.DNE;
         }
-        return flags;
     }
     overwriteEntry(key, value)
     {
         this.db[key] = value;
         this.updateDB();
+        return Flags.OVERWRITE;
     }
     delete(name)
     {
@@ -50,10 +52,10 @@ module.exports = class Database
             {
                 delete this.db[name];
                 this.updateDB();
-                return true;
+                return Flags.EXISTS;
             }
         }
-        return false;
+        return Flags.DNE;
     }
     deleteLast()
     {
@@ -62,9 +64,16 @@ module.exports = class Database
         {
             last = o;
         }
-        delete this.db[last];
-        this.updateDB();
-        return last;
+        if(last)
+        {
+            delete this.db[last];
+            this.updateDB();
+            return Flags.EXISTS;
+        }
+        else
+        {
+            return Flags.DNE;
+        }
     }
     updateDB()
     {
