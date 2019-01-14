@@ -1,10 +1,10 @@
 const EventEmitter = require('events');
 const Database = require('./database.js');
-const Commands = require('./commands.js');
+const Fetch = require('./fetch.js');
 const Parse = require('./parsehelper.js');
 const logger = require('./logger.js');
 var linksDB = require('./links.json');
-var Fetch = Commands.Fetch;
+// var Fetch = Commands.Fetch;
 
 //Node.js export for use in other scripts
 //Cmd class contains functions that are crucial for bot commands
@@ -85,12 +85,9 @@ module.exports = class CmdParser extends EventEmitter {
         switch(cmd)
         {
             case "help": Fetch.help(this, args[0]); break;
-            case "addlink": Fetch.addLink(this, args); break;
-            case "getlink": Fetch.getLink(this, args[0]); break;
-            case "deletelink": Fetch.deleteLink(this, args[0]); break;
-            case "deletelast": Fetch.deleteLast(this); break;
             case "find":Fetch.find(this, opt, args); break;
             case "delete":Fetch.delete(this, opt, args); break;
+            case "add":Fetch.add(this,opt,args); break;
         }
     }
     //Returns specified role of member if member contains it

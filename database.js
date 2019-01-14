@@ -15,6 +15,10 @@ module.exports = class Database
     {
         return this.db;
     }
+    exists(key)
+    {
+        return this.db.hasOwnProperty(key);
+    }
     getEntry(key)
     {
         return this.db[key];
@@ -25,24 +29,10 @@ module.exports = class Database
         out[name] = this.db[name];
         return out;
     }
-    addEntry(key, value)
-    {
-        if(this.db[key])
-        {
-            return Flags.EXISTS;
-        }
-        else
-        {
-            this.db[key] = value;
-            this.updateDB();
-            return Flags.DNE;
-        }
-    }
-    overwriteEntry(key, value)
+    add(key, value)
     {
         this.db[key] = value;
         this.updateDB();
-        return Flags.OVERWRITE;
     }
     delete(name)
     {

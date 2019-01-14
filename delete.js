@@ -3,13 +3,13 @@ const msg = ['deleted','wrongop','notfound','noinput'];
 
 module.exports = class Delete
 {
-    static links(db, usr, link)
+    static link(db, usr, link)
     {
         if(link)
         {
             if(db.get(link).op==usr)
             {
-                if(db.delete(link) == DB.Flags.EXISTS))
+                if(db.delete(link) == DB.Flags.EXISTS)
                 {
                     return msg[0];
                 }

@@ -18,7 +18,7 @@
             "wrongch":"DM me !help for that command."
         }
     },
-    "addlink":{
+    "add":{
         "roles":["Mods","Dev","Testers","Runners","Community-Dev"],
         "channels":["text"],
         "servers":[
@@ -26,20 +26,23 @@
             "Ch1pset"
         ],
         "help":[
-            "```!addlink link, name, tag1, tag2, ...```",
+            "```!add link, name, tag1, tag2, ...```",
             "-Links must start with \"http\"",
             "-Link names and tags may contain spaces, and are NOT case sensitive",
             "Example:",
-            "```markdown",
-            "!addlink https://link, link name, first tag, second tag",
-            "Link added!",
-            "```"
+            "```!addlink https://link, link name, first tag, second tag```\n",
+            "**Options**",
+            "`!add-tags` or `!add-tag` or `!add-t` may be used to add tags to specified links:",
+            "```!add-t name of link, tag1, tag2, tag3```",
+            "`!add-link` or `!add-l` will perform default operation.\n"
         ],
         "message":{
             "added":"Link added!",
-            "overwrite":"Link overwritten!",
+            "overwrite":"Link has been edited!",
+            "nopermit":"This command can only be used in permitted channels with permitted roles.",
             "badlink":"Only links beginning with http or https allowed!",
-            "noedit":"Only OP can overwrite their own links!",
+            "noedit":"Only OP can overwrite or edit their own links!",
+            "notfound":"No link by that name in database.",
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",
                 "Separate arguments by a comma followed by a space: `arg1, arg2`",
@@ -83,7 +86,7 @@
         ],
         "message":{
             "deleted":"Successfully deleted entry.",
-            "wrongop":"Only original poster of links can edit or delete them.",
+            "wrongop":"Only OP can edit or delete their own links.",
             "nopermit":"Only members with permitted roles can delete links.",
             "notfound":"That entry was not found in the database.",
             "noinput":"Please enter the name of what you want to delete."

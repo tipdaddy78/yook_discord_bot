@@ -50,6 +50,6 @@ module.exports = class Find
             }
         }
         out.sort();
-        return out.toString();
+        return out.join(', ');
     }
 }
