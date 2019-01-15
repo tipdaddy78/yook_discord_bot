@@ -8,8 +8,8 @@ module.exports = class Add
         if(args.length > 0)
         {
             let link = args[0];
-            let tags = args.shift();
-            let entry = db.get(link);
+            let tags = args.slice(1);
+            let entry = db.getEntry(link);
             if(entry.op==usr)
             {
                 if(db.exists(link))
@@ -63,8 +63,7 @@ module.exports = class Add
             {
                 if(db.exists(name))
                 {
-                    //TODO:Ovewrite Code Here
-                    if(db.get(name).op==usr)
+                    if(db.getEntry(name).op==usr)
                     {
                         db.add(name, value);
                         return msg[1];

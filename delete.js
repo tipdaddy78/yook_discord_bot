@@ -7,20 +7,21 @@ module.exports = class Delete
     {
         if(link)
         {
-            if(db.get(link).op==usr)
+            if(db.exists(link))
             {
-                if(db.delete(link) == DB.Flags.EXISTS)
+                if(db.getEntry(link).op==usr)
                 {
+                    db.delete(link)
                     return msg[0];
                 }
                 else
                 {
-                    return msg[2];
+                    return msg[1];
                 }
             }
             else
             {
-                return msg[1];
+                return msg[2];
             }
         }
         else
@@ -28,27 +29,34 @@ module.exports = class Delete
             return msg[3];
         }
     }
-    static tags(db, usr, link, tag)
+    static tag(db, usr, link, tag)
     {
         if(link && tag)
         {
-            if(db.get(link).op==usr)
+            if(db.exists(link))
             {
-                if(db.get(link).tags.includes(tag))
+                if(db.getEntry(link).op==usr)
                 {
-                    let tmp_entry = db.get(link);
-                    tmp_entry.tags.splice(tmp_entry.tags.indexOf(tag),1);
-                    db.overwrite(link,tmp_entry);
-                    return msg[0];
+                    if(db.getEntry(link).tags.includes(tag))
+                    {
+                        let tmp_entry = db.getEntry(link);
+                        tmp_entry.tags.splice(tmp_entry.tags.indexOf(tag),1);
+                        db.add(link,tmp_entry);
+                        return msg[0];
+                    }
+                    else
+                    {
+                        return msg[2];
+                    }
                 }
                 else
                 {
-                    return msg[2];
+                    return msg[1];
                 }
             }
             else
             {
-                return msg[1];
+                return msg[2]
             }
         }
         else

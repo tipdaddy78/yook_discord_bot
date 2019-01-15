@@ -1,7 +1,6 @@
 const fs = require('fs');
 const logger = require('./logger.js');
 
-const Flags = {DNE:0,EXISTS:1,OVERWRITE:2};
 
 //Database class represents a JSON file which may be read from and written to
 module.exports = class Database
@@ -42,10 +41,10 @@ module.exports = class Database
             {
                 delete this.db[name];
                 this.updateDB();
-                return Flags.EXISTS;
+                return 1;
             }
         }
-        return Flags.DNE;
+        return 0;
     }
     deleteLast()
     {

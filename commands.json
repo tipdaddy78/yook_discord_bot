@@ -18,6 +18,20 @@
             "wrongch":"DM me !help for that command."
         }
     },
+    "get":{
+        "roles":[],
+        "channels":["dm","text","group"],
+        "servers":[],
+        "help":[
+            "```!get name```",
+            "-Returns the link with the matching name\n",
+            "**Options**",
+            "`!get-link` or `!get-l` perform default function"
+        ],
+        "message":{
+            "notfound":"No link with that name in the database"
+        }
+    },
     "add":{
         "roles":["Mods","Dev","Testers","Runners","Community-Dev"],
         "channels":["text"],
@@ -87,7 +101,7 @@
         "message":{
             "deleted":"Successfully deleted entry.",
             "wrongop":"Only OP can edit or delete their own links.",
-            "nopermit":"Only members with permitted roles can delete links.",
+            "nopermit":"This command can only be used in permitted channels by members with permitted roles.",
             "notfound":"That entry was not found in the database.",
             "noinput":"Please enter the name of what you want to delete."
         }

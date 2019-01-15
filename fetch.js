@@ -34,10 +34,10 @@ module.exports = class Fetch
                 out.push('You must have one of these roles: ');
                 out.push('`' + cmd.roles + '`');
             }
-            out.push('This commands works in: ');
+            out.push('This command works in: ');
             out.push(cmd.channels + ' channels');
             out.push('List of commands:');
-            out.push(Command.list());
+            out.push(Command.list().join(', '));
             e.emit(
                 'cmd',
                 {
@@ -52,14 +52,39 @@ module.exports = class Fetch
             Fetch.help(e, 'help');
         }
     }
+    static get(e, opt, name)
+    {
+        let output = [];
+        let cmd = new Command('get');
+        switch(opt)
+        {
+            case 'link': case 'l': default:
+            if(e.db.exists(name))
+            {
+                let link = e.db.getEntry(name);
+                output.push('['+name+']'+'(<'+link.data+'>)');
+                output.push('tags: '+link.tags.join(', '));
+                output.push('Posted by ' + link.op);
+            }
+            else
+            {
+                output = cmd.message('notfound');
+            }
+            return e.emit('cmd',
+                {
+                    data:e.data,
+                    ch:'ch',
+                    out:output
+                }
+            );
+        }
+    }
     static find(e, opt, args)
     {
         let output = [];
         let cmd = new Command('find');
         switch(opt)
         {
-            case 'help': case 'h':
-            return this.help(e, cmd.str);
             case 'tags': case 'tag': case 't':
             output = Find.tags(e.db.all, args);
             break;
@@ -88,8 +113,6 @@ module.exports = class Fetch
         {
             switch(opt)
             {
-                case 'help': case 'h':
-                return this.help(e, cmd.str);
                 case 'tag': case 't':
                 output = Del.tag(e.db, e.data.username, args[0], args[1]);
                 break;
@@ -119,8 +142,6 @@ module.exports = class Fetch
         {
             switch(opt)
             {
-                case 'help': case 'h':
-                return this.help(e, cmd.str);
                 case 'tags': case 'tag': case 't':
                 output = Add.tag(e.db, e.data.username, args);
                 break;
