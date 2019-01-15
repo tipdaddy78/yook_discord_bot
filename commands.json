@@ -26,7 +26,7 @@
             "```!get name```",
             "-Returns the link with the matching name\n",
             "**Options**",
-            "`!get-link` or `!get-l` perform default function"
+            "`!getlink` or `!getl` perform default function"
         ],
         "message":{
             "notfound":"No link with that name in the database"
@@ -46,9 +46,9 @@
             "Example:",
             "```!addlink https://link, link name, first tag, second tag```\n",
             "**Options**",
-            "`!add-tags` or `!add-tag` or `!add-t` may be used to add tags to specified links:",
-            "```!add-t name of link, tag1, tag2, tag3```",
-            "`!add-link` or `!add-l` will perform default operation.\n"
+            "`!addtags` or `!addtag` or `!addt` may be used to add tags to specified links:",
+            "```!addt name of link, tag1, tag2, tag3```",
+            "`!addlink` or `!addl` will perform default operation.\n"
         ],
         "message":{
             "added":"Link added!",
@@ -60,7 +60,7 @@
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",
                 "Separate arguments by a comma followed by a space: `arg1, arg2`",
-                "For more info, use `!help addlink`"
+                "For more info, use `!help add`"
             ]
         }
     },
@@ -73,8 +73,8 @@
             "-Find will return any links whose names or tags contain any of the keyword terms",
             "-Keyword terms may have spaces, but this will limit your search\n",
             "**Options**",
-            "`!find-links` or `!find-link` or `!find-l` may be used optionally to specify a search for links",
-            "`!find-tags` or `!find-tag` or `!find-t` may be used to optionally specify a search for tags",
+            "`!findlinks` or `!findlink` or `!findl` may be used optionally to specify a search for links",
+            "`!findtags` or `!findtag` or `!findt` may be used to optionally specify a search for tags",
             "Unsupported options will be ignored. Command will still execute links search by default.",
             "*Note: If no keywords are entered in !find-tags, Find will return all tags from all links*\n"
         ],
@@ -94,8 +94,8 @@
             "-Item names may contain spaces and are NOT case sensitive",
             "-This command cannot be undone, and takes effect immediately\n",
             "**Options**",
-            "`!delete-links` or `!delete-link` or `!delete-l` may be used optionally to specify deletion of links",
-            "`!delete-tags` or `!delete-tag` or `!delete-t` may be used to optionally specify deletion of tags within links",
+            "`!deletelinks` or `!deletelink` or `!deletel` may be used optionally to specify deletion of links",
+            "`!deletetags` or `!deletetag` or `!deletet` may be used to optionally specify deletion of tags within links",
             "Unsupported options will be ignored. Command will still execute links deletion by default.\n"
         ],
         "message":{
