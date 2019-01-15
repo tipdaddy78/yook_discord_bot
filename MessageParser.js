@@ -87,7 +87,6 @@ module.exports = class CmdParser extends EventEmitter {
         if(msg.content[0]=='!')
         {
             this.args = msg.content;
-            logger.info('Cmd:' + this.arg_list.cmd);
             this.fetchCommand(this.cmd, this.opt, this.args);
         }
     }

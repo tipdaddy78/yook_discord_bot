@@ -9,7 +9,7 @@ const auth = require('./auth.json');
 
 // Initialize Discord Bot
 var bot = new Discord.Client();
-var cmd = new MessageParser();
+var input = new MessageParser();
 
 //Event listener for when bot successfully logs on
 bot.on('ready', (evt) =>
@@ -28,15 +28,15 @@ bot.on('message', msg =>
 
 //Event listener for anytime a command is used. Output message gets sent to
 //proper channel here.
-cmd.on('cmd', (e) =>
+input.on('cmd', (e) =>
     {
-        logger.info(e.data.username + ' used ' + e.data.cmd + ' successfully');
+        logger.info(e.data.username + ' used ' + e.data.cmd);
         selectChannel(e.ch, e.data, e.out);
     }
 );
 
 //Event listener for any errors thrown by a command.
-cmd.on('err', (e) =>
+input.on('err', (e) =>
     {
         logger.info(e.data.cmd + ' threw an error for ' + e.data.username + ':' + e.err);
         selectChannel(e.ch, e.data, e.out);
