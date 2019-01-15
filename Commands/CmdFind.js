@@ -43,7 +43,7 @@ module.exports = class Find
                         out.push(t);
                     }
                 }
-                if(keywds.length == 0)
+                if(keywds.length == 0 && !out.includes(t))
                 {
                     out.push(t);
                 }
