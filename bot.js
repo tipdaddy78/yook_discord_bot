@@ -30,7 +30,7 @@ bot.on('message', msg =>
 //proper channel here.
 cmd.on('cmd', (e) =>
     {
-        logger.info(e.data.username + ' used ' + e.cmd);
+        logger.info(e.data.username + ' used ' + e.data.cmd + ' successfully');
         selectChannel(e.ch, e.data, e.out);
     }
 );
@@ -38,7 +38,7 @@ cmd.on('cmd', (e) =>
 //Event listener for any errors thrown by a command.
 cmd.on('err', (e) =>
     {
-        logger.info(e.cmd + ' threw an error for ' + e.data.username + ':' + e.err);
+        logger.info(e.data.cmd + ' threw an error for ' + e.data.username + ':' + e.err);
         selectChannel(e.ch, e.data, e.out);
     }
 );

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const logger = require('./logger.js');
 
+
 //Database class represents a JSON file which may be read from and written to
 module.exports = class Database
 {
@@ -13,6 +14,10 @@ module.exports = class Database
     {
         return this.db;
     }
+    exists(key)
+    {
+        return this.db.hasOwnProperty(key);
+    }
     getEntry(key)
     {
         return this.db[key];
@@ -23,21 +28,7 @@ module.exports = class Database
         out[name] = this.db[name];
         return out;
     }
-    addEntry(key, value)
-    {
-        let flags = {"exists":false};
-        if(this.db[key])
-        {
-            flags.exists = true;
-        }
-        else
-        {
-            this.db[key] = value;
-            this.updateDB();
-        }
-        return flags;
-    }
-    overwriteEntry(key, value)
+    add(key, value)
     {
         this.db[key] = value;
         this.updateDB();
@@ -50,10 +41,10 @@ module.exports = class Database
             {
                 delete this.db[name];
                 this.updateDB();
-                return true;
+                return 1;
             }
         }
-        return false;
+        return 0;
     }
     deleteLast()
     {
@@ -62,9 +53,16 @@ module.exports = class Database
         {
             last = o;
         }
-        delete this.db[last];
-        this.updateDB();
-        return last;
+        if(last)
+        {
+            delete this.db[last];
+            this.updateDB();
+            return Flags.EXISTS;
+        }
+        else
+        {
+            return Flags.DNE;
+        }
     }
     updateDB()
     {

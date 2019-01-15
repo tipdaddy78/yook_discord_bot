@@ -1,9 +1,11 @@
 const EventEmitter = require('events');
 const Database = require('./database.js');
-const Fetch = require('./commands.js');
+const Commands = require('./commands.js');
+const Fetch = require('./fetch.js');
 const Parse = require('./parsehelper.js');
 const logger = require('./logger.js');
 var linksDB = require('./links.json');
+// var Fetch = Commands.Fetch;
 
 //Node.js export for use in other scripts
 //Cmd class contains functions that are crucial for bot commands
@@ -43,31 +45,44 @@ module.exports = class CmdParser extends EventEmitter {
     set args(a)
     {
         this.arg_list = {};
-        this.arg_list['cmd'] = a.substring(1).split(' ')[0].toLowerCase().split('-');
+        this.arg_list.cmd = [];
+        let cmd = a.toLowerCase().split(' ')[0];
+        for(let c of Commands.list())
+        {
+            if(cmd.includes(c))
+            {
+                this.arg_list.cmd.push(cmd.substring(1,c.length));
+                if(cmd.length > c.length)
+                {
+                    this.arg_list.cmd.push(cmd.substring(c.length));
+                }
+            }
+        }
         if(a.trim().includes(' '))
         {
-            this.arg_list['args'] = a.substring(a.indexOf(' ')+1).toLowerCase().split(',');
-            for(let a in this.arg_list['args'])
+            this.arg_list.args = a.substring(a.indexOf(' ')+1).toLowerCase().split(',');
+            for(let a in this.arg_list.args)
             {
-                this.arg_list['args'][a] = this.arg_list['args'][a].trim();
+                this.arg_list.args[a] = this.arg_list.args[a].trim();
             }
         }
         else
         {
-            this.arg_list['args'] = [];
+            this.arg_list.args = [];
+            logger.info('No arguments')
         }
     }
     get args()
     {
-        return this.arg_list['args'];
+        return this.arg_list.args;
     }
     get cmd()
     {
-        return this.arg_list['cmd'][0];
+        return this.arg_list.cmd[0];
     }
     get opt()
     {
-        return this.arg_list['cmd'][1];
+        return this.arg_list.cmd[1];
     }
     set input(msg)
     {
@@ -75,6 +90,7 @@ module.exports = class CmdParser extends EventEmitter {
         if(msg.content[0]=='!')
         {
             this.args = msg.content;
+            logger.info('Cmd:' + this.arg_list.cmd);
             this.fetchCommand(this.cmd, this.opt, this.args);
         }
     }
@@ -83,12 +99,10 @@ module.exports = class CmdParser extends EventEmitter {
         switch(cmd)
         {
             case "help": Fetch.help(this, args[0]); break;
-            case "addlink": Fetch.addLink(this, args); break;
-            case "getlink": Fetch.getLink(this, args[0]); break;
-            case "deletelink": Fetch.deleteLink(this, args[0]); break;
-            case "deletelast": Fetch.deleteLast(this); break;
             case "find":Fetch.find(this, opt, args); break;
             case "delete":Fetch.delete(this, opt, args); break;
+            case "add":Fetch.add(this,opt,args); break;
+            case "get":Fetch.get(this,opt,args[0]); break;
         }
     }
     //Returns specified role of member if member contains it
