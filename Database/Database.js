@@ -1,11 +1,13 @@
 const fs = require('fs');
-const logger = require('./logger.js');
+const filepath = './links.json';
+const json = require(filepath);
+const logger = require('../Logger.js');
 
 
 //Database class represents a JSON file which may be read from and written to
 module.exports = class Database
 {
-    constructor(filepath, json)
+    constructor()
     {
         this.db = json;
         this.filepath = filepath;
@@ -45,24 +47,6 @@ module.exports = class Database
             }
         }
         return 0;
-    }
-    deleteLast()
-    {
-        let last = null;
-        for(let o in this.db)
-        {
-            last = o;
-        }
-        if(last)
-        {
-            delete this.db[last];
-            this.updateDB();
-            return Flags.EXISTS;
-        }
-        else
-        {
-            return Flags.DNE;
-        }
     }
     updateDB()
     {

@@ -55,6 +55,6 @@ class Logger
     }
 }
 
-const logger = new Logger({logfile:'./inept.log',errfile:'./crash.log'});
+const logger = new Logger({logfile:'./Logs/inept.log',errfile:'./Logs/crash.log'});
 
 module.exports = logger;

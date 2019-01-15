@@ -1,5 +1,5 @@
+const logger = require('../Logger.js');
 const cmdList = require('./commands.json');
-const logger = require('./logger.js');
 
 
 module.exports = class Command

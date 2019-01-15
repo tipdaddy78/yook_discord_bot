@@ -1,9 +1,8 @@
-const Command = require('./commands.js');
-const DB = require('./database.js');
-const Find = require('./find.js');
-const Del = require('./delete.js');
-const Add = require('./add.js');
-const logger = require('./logger.js');
+const Command = require('./Commands.js');
+const Find = require('./CmdFind.js');
+const Del = require('./CmdDelete.js');
+const Add = require('./CmdAdd.js');
+const logger = require('../Logger.js');
 
 module.exports = class Fetch
 {
@@ -35,7 +34,7 @@ module.exports = class Fetch
                 out.push('`' + cmd.roles + '`');
             }
             out.push('This command works in: ');
-            out.push(cmd.channels + ' channels');
+            out.push(cmd.channels.join(', ') + ' channels');
             out.push('List of commands:');
             out.push(Command.list().join(', '));
             e.emit(

@@ -3,13 +3,13 @@
  */
 
 const Discord = require('discord.js');
-const CmdParser = require('./cmdparser.js');
-const logger = require('./logger.js');
+const MessageParser = require('./MessageParser.js');
+const logger = require('./Logger.js');
 const auth = require('./auth.json');
 
 // Initialize Discord Bot
 var bot = new Discord.Client();
-var cmd = new CmdParser();
+var cmd = new MessageParser();
 
 //Event listener for when bot successfully logs on
 bot.on('ready', (evt) =>

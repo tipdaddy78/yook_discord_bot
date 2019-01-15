@@ -1,11 +1,8 @@
 const EventEmitter = require('events');
-const Database = require('./database.js');
-const Commands = require('./commands.js');
-const Fetch = require('./fetch.js');
-const Parse = require('./parsehelper.js');
-const logger = require('./logger.js');
-var linksDB = require('./links.json');
-// var Fetch = Commands.Fetch;
+const Database = require('./Database/Database.js');
+const Commands = require('./Commands/Commands.js');
+const Fetch = require('./Commands/CommandFetcher.js');
+const logger = require('./Logger.js');
 
 //Node.js export for use in other scripts
 //Cmd class contains functions that are crucial for bot commands
@@ -15,7 +12,7 @@ module.exports = class CmdParser extends EventEmitter {
     constructor()
     {
         super();
-        this.db = new Database('./links.json', linksDB);
+        this.db = new Database();
     }
     set data(msg)
     {

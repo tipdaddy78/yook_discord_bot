@@ -44,8 +44,9 @@
             "-Links must start with \"http\"",
             "-Link names and tags may contain spaces, and are NOT case sensitive",
             "Example:",
-            "```!addlink https://link, link name, first tag, second tag```\n",
+            "```!add https://link, link name, first tag, second tag```\n",
             "**Options**",
+            "`!addlink` or `!addl` do the same as `!add`",
             "`!addtags` or `!addtag` or `!addt` may be used to add tags to specified links:",
             "```!addt name of link, tag1, tag2, tag3```",
             "`!addlink` or `!addl` will perform default operation.\n"
@@ -76,7 +77,7 @@
             "`!findlinks` or `!findlink` or `!findl` may be used optionally to specify a search for links",
             "`!findtags` or `!findtag` or `!findt` may be used to optionally specify a search for tags",
             "Unsupported options will be ignored. Command will still execute links search by default.",
-            "*Note: If no keywords are entered in !find-tags, Find will return all tags from all links*\n"
+            "*Note: If no keywords are entered in !findtags, Find will return all tags from all links*\n"
         ],
         "message":{
             "notfound":"No results. Make sure to separate each keyword with a comma to expand search."
@@ -90,12 +91,12 @@
             "Ch1pset"
         ],
         "help":[
-            "```!delete item```",
-            "-Item names may contain spaces and are NOT case sensitive",
+            "```!delete linkname```",
+            "-Link names may contain spaces and are NOT case sensitive",
             "-This command cannot be undone, and takes effect immediately\n",
             "**Options**",
-            "`!deletelinks` or `!deletelink` or `!deletel` may be used optionally to specify deletion of links",
-            "`!deletetags` or `!deletetag` or `!deletet` may be used to optionally specify deletion of tags within links",
+            "`!deletelinks` or `!deletelink` or `!deletel` may be used optionally to specify deletion of a link",
+            "`!deletetag` or `!deletet` may be used to optionally specify deletion of a single tag within a link",
             "Unsupported options will be ignored. Command will still execute links deletion by default.\n"
         ],
         "message":{

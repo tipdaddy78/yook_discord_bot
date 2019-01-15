@@ -1,4 +1,4 @@
-const logger = require('./logger.js');
+const logger = require('../Logger.js');
 
 module.exports = class Find
 {

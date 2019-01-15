@@ -1,4 +1,4 @@
-const DB = require('./database.js');
+const logger = require('../Logger.js');
 const msg = ['deleted','wrongop','notfound','noinput'];
 
 module.exports = class Delete

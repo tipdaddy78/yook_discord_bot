@@ -1,4 +1,4 @@
-const DB = require('./database.js');
+const logger = require('../Logger.js');
 const msg = ['added','overwrite','badlink','noedit','notfound','missingarg']
 
 module.exports = class Add
