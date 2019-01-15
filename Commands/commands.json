@@ -56,7 +56,7 @@
             "overwrite":"Link has been edited!",
             "nopermit":"This command can only be used in permitted channels with permitted roles.",
             "badlink":"Only links beginning with http or https allowed!",
-            "noedit":"Only OP can overwrite or edit their own links!",
+            "noedit":"Only OP can overwrite, edit or delete their own links!",
             "notfound":"No link by that name in database.",
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",

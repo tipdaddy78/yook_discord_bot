@@ -22,7 +22,7 @@ bot.on('ready', (evt) =>
 //has access to. Don't worry, I'm not logging everyone's messages to the bot.
 bot.on('message', msg =>
     {
-        cmd.input = msg;
+        input.input = msg;
     }
 );
 

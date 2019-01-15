@@ -21,7 +21,7 @@ module.exports = class Fetch
         let cmd = new Command(a?(a[0]=='!'?a.substring(1):a):'help');
         let out = ['Usage:'];
         let i = 0;
-        if(cmd.exists())
+        if(Command.exists(cmd.str))
         {
             for(let h of cmd.help)
             {

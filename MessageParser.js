@@ -6,7 +6,7 @@ const logger = require('./Logger.js');
 
 //Node.js export for use in other scripts
 //Cmd class contains functions that are crucial for bot commands
-module.exports = class CmdParser extends EventEmitter {
+module.exports = class MessageParser extends EventEmitter {
     //All classes must have a constructor, a default will be used if not called
     //exclusively
     constructor()

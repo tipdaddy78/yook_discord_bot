@@ -1,8 +1,47 @@
 const logger = require('../Logger.js');
+const Command = require('./Commands.js');
 const msg = ['added','overwrite','badlink','noedit','notfound','missingarg']
 
-module.exports = class Add
+module.exports = class CmdAdd extends Command
 {
+    constructor(opt, db, usr, args)
+    {
+        super('add');
+        this.opt = opt;
+        this.db = db;
+        this.usr = usr;
+        this.args = args;
+    }
+    set args(args)
+    {
+        if(args.length > 0)
+        {
+            switch(this.opt)
+            {
+                case 'tags': case 'tag': case 't':
+                this.name = args[0];
+                this.tags = args.slice(1);
+                this.entry = this.db.getEntry(this.name);
+                break;
+                case 'link': case 'l': default:
+                this.name = args[1];
+                this.entry = this.createObj(args[0], args.slice(2), this.usr);
+                break;
+            }
+        }
+        else
+        {
+            this.msg = 'missingarg';
+        }
+    }
+    createObj(link, tags, op)
+    {
+        return {data:link,tags:tags,op:op};
+    }
+    tags()
+    {
+
+    }
     static tag(db, usr, args)
     {
         if(args.length > 0)

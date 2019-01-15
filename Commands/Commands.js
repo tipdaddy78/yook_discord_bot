@@ -8,25 +8,9 @@ module.exports = class Command
     {
         this.cmd_str = cmd_str;
     }
-    exists()
-    {
-        return cmdList.hasOwnProperty(this.cmd_str);
-    }
     get()
     {
         return cmdList[this.cmd_str];
-    }
-    static list()
-    {
-        let out = [];
-        for(let c in cmdList)
-        {
-            if(c != 'invalid')
-            {
-                out.push('!' + c);
-            }
-        }
-        return out;
     }
     get str()
     {
@@ -47,5 +31,21 @@ module.exports = class Command
     message(msg)
     {
         return this.get().message[msg];
+    }
+    static exists(cmd_str)
+    {
+        return cmdList.hasOwnProperty(cmd_str);
+    }
+    static list()
+    {
+        let out = [];
+        for(let c in cmdList)
+        {
+            if(c != 'invalid')
+            {
+                out.push('!' + c);
+            }
+        }
+        return out;
     }
 }
