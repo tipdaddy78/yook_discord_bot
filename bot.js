@@ -1,25 +1,63 @@
+/*
+ *  Collection of event listenters for bot operation.
+ */
+
 const Discord = require('discord.js');
-const logger = require('winston');
+const MessageParser = require('./MessageParser.js');
+const logger = require('./Logger.js');
 const auth = require('./auth.json');
-const Cmd = require('./command.js');
 
-// Configure logger settings
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console, {
-    colorize: true
-});
-logger.level = 'debug';
 // Initialize Discord Bot
-const bot = new Discord.Client();
+var bot = new Discord.Client();
+var input = new MessageParser();
 
-bot.on('ready', (evt) => {
-    logger.info('Connected');
-    logger.info('Logged in as: ' + bot.user);
-});
+//Event listener for when bot successfully logs on
+bot.on('ready', (evt) =>
+    {
+        logger.info('Connected: Logged in as:' + bot.user.username + ' id:' + bot.user.id);
+    }
+);
 
+//Event listener for anytime a message is posted in a channel that our bot
+//has access to. Don't worry, I'm not logging everyone's messages to the bot.
+bot.on('message', msg =>
+    {
+        cmd.input = msg;
+    }
+);
 
-bot.on('message', msg => {
-    let cmd = new Cmd(msg);
-    cmd.parseBang();
-});
-bot.login(auth.token)
+//Event listener for anytime a command is used. Output message gets sent to
+//proper channel here.
+input.on('cmd', (e) =>
+    {
+        logger.info(e.data.username + ' used ' + e.data.cmd);
+        selectChannel(e.ch, e.data, e.out);
+    }
+);
+
+//Event listener for any errors thrown by a command.
+input.on('err', (e) =>
+    {
+        logger.info(e.data.cmd + ' threw an error for ' + e.data.username + ':' + e.err);
+        selectChannel(e.ch, e.data, e.out);
+    }
+);
+
+process.on('uncaughtException', msg =>
+    {
+        logger.error(msg);
+    }
+);
+
+//Utility function to select output channel for sending messages from the bot.
+function selectChannel(channel, data, output)
+{
+    switch(channel)
+    {
+        case 'ch': data.channel.send(output); break;
+        case 're': data.msg.reply(output); break;
+        case 'dm': data.usr.send(output); break;
+    }
+}
+
+bot.login(auth.token);

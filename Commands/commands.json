@@ -1,0 +1,110 @@
+{
+    "invalid":{
+        "roles":[],
+        "channels":["dm","text","group"],
+        "servers":[],
+        "help":[
+            "Command not found."
+        ]
+    },
+    "help":{
+        "roles":[],
+        "channels":["dm","text","group"],
+        "servers":[],
+        "help":[
+            "```!help command```"
+        ],
+        "message":{
+            "wrongch":"DM me !help for that command."
+        }
+    },
+    "get":{
+        "roles":[],
+        "channels":["dm","text","group"],
+        "servers":[],
+        "help":[
+            "```!get name```",
+            "-Returns the link with the matching name\n",
+            "**Options**",
+            "`!getlink` or `!getl` perform default function"
+        ],
+        "message":{
+            "notfound":"No link with that name in the database"
+        }
+    },
+    "add":{
+        "roles":["Mods","Dev","Testers","Runners","Community-Dev"],
+        "channels":["text"],
+        "servers":[
+            "Yooka-Laylee Speedrunning",
+            "Ch1pset"
+        ],
+        "help":[
+            "```!add link, name, tag1, tag2, ...```",
+            "-Links must start with \"http\"",
+            "-Link names and tags may contain spaces, and are NOT case sensitive",
+            "Example:",
+            "```!add https://link, link name, first tag, second tag```\n",
+            "**Options**",
+            "`!addlink` or `!addl` do the same as `!add`",
+            "`!addtags` or `!addtag` or `!addt` may be used to add tags to specified links:",
+            "```!addt name of link, tag1, tag2, tag3```",
+            "`!addlink` or `!addl` will perform default operation.\n"
+        ],
+        "message":{
+            "added":"Link added!",
+            "overwrite":"Link has been edited!",
+            "nopermit":"This command can only be used in permitted channels with permitted roles.",
+            "badlink":"Only links beginning with http or https allowed!",
+            "noedit":"Only OP can overwrite or edit their own links!",
+            "notfound":"No link by that name in database.",
+            "missingarg":[
+                "You must provide a link, name, and at least 1 tag.",
+                "Separate arguments by a comma followed by a space: `arg1, arg2`",
+                "For more info, use `!help add`"
+            ]
+        }
+    },
+    "find":{
+        "roles":[],
+        "channels":["dm"],
+        "servers":[],
+        "help":[
+            "```!find keyword 1, keyword 2, ..., last keyword```",
+            "-Find will return any links whose names or tags contain any of the keyword terms",
+            "-Keyword terms may have spaces, but this will limit your search\n",
+            "**Options**",
+            "`!findlinks` or `!findlink` or `!findl` may be used optionally to specify a search for links",
+            "`!findtags` or `!findtag` or `!findt` may be used to optionally specify a search for tags",
+            "Unsupported options will be ignored. Command will still execute links search by default.",
+            "*Note: If no keywords are entered in !findtags, Find will return all tags from all links*\n"
+        ],
+        "message":{
+            "notfound":"No results. Make sure to separate each keyword with a comma to expand search."
+        }
+    },
+    "delete":{
+        "roles":["Mods","Dev","Community-Dev"],
+        "channels":["text"],
+        "servers":[
+            "Yooka-Laylee Speedrunning",
+            "Ch1pset"
+        ],
+        "help":[
+            "```!delete linkname```",
+            "-Link names may contain spaces and are NOT case sensitive",
+            "-This command cannot be undone, and takes effect immediately\n",
+            "**Options**",
+            "`!deletelinks` or `!deletelink` or `!deletel` may be used optionally to specify deletion of a link",
+            "`!deletetag` or `!deletet` may be used to optionally specify deletion of a single tag within a link",
+            "Unsupported options will be ignored. Command will still execute links deletion by default.\n"
+        ],
+        "message":{
+            "deleted":"Successfully deleted entry.",
+            "wrongop":"Only OP can edit or delete their own links.",
+            "nopermit":"This command can only be used in permitted channels by members with permitted roles.",
+            "notfound":"That entry was not found in the database.",
+            "noinput":"Please enter the name of what you want to delete."
+        }
+    }
+}

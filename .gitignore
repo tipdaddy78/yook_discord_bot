@@ -2,6 +2,6 @@ auth.json
 package.json
 package-lock.json
 links.json
-commands.json
-cmd_data.json
 node_modules/
+inept.log
+crash.log
