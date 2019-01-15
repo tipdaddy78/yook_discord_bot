@@ -48,10 +48,10 @@ module.exports = class CmdAdd extends Command
         {
             let link = args[0];
             let tags = args.slice(1);
-            let entry = db.getEntry(link);
-            if(entry.op==usr)
+            if(db.exists(link))
             {
-                if(db.exists(link))
+                let entry = db.getEntry(link);
+                if(entry.op==usr)
                 {
                     let new_tags = entry.tags;
                     for(let t of tags)
@@ -72,12 +72,12 @@ module.exports = class CmdAdd extends Command
                 }
                 else
                 {
-                    return msg[4];
+                    return msg[3];
                 }
             }
             else
             {
-                return msg[3];
+                return msg[4];
             }
         }
         else

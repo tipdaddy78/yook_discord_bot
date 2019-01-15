@@ -4,7 +4,7 @@ const Del = require('./CmdDelete.js');
 const Add = require('./CmdAdd.js');
 const logger = require('../Logger.js');
 
-module.exports = class Fetch
+module.exports = class CommandFetcher
 {
     //Help command will provide information for specified commands.
     //Example:  !help
