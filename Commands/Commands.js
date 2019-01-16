@@ -8,6 +8,18 @@ module.exports = class Command
     {
         this.cmd_str = cmd_str;
     }
+
+    //Interface methods, must be implemented
+    execute(opt)
+    {
+        throw Error(`Command has no execute implementation!`);
+    }
+    exit(msg)
+    {
+        throw Error(`Command has no exit implementation!`);
+    }
+
+    //Inherited getters, must not be overridden
     get()
     {
         return cmdList[this.cmd_str];
@@ -32,6 +44,8 @@ module.exports = class Command
     {
         return this.get().message[msg];
     }
+
+    //Static methods
     static exists(cmd_str)
     {
         return cmdList.hasOwnProperty(cmd_str);

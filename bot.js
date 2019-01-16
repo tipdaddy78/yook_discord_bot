@@ -23,7 +23,10 @@ bot.on('ready', (evt) =>
 //has access to. Don't worry, I'm not logging everyone's messages to the bot.
 bot.on('message', msg =>
     {
-        input.set(msg);
+        if(input.isCommand(msg.content[0]))
+        {
+            input.set(msg);
+        }
     }
 );
 

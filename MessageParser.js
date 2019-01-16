@@ -3,6 +3,7 @@ const EventEmitter = require('events');
 const Commands = require('./Commands/Commands.js');
 const Fetch = require('./Commands/CommandFetcher.js');
 const CmdAdd = require('./Commands/CmdAdd.js');
+const CmdHelp = require('./Commands/CmdHelp.js');
 const logger = require('./Logger.js');
 
 //Node.js export for use in other scripts
@@ -84,20 +85,24 @@ module.exports = class MessageParser extends EventEmitter {
     {
         return this.arg_list.cmd[1];
     }
+    isCommand(char)
+    {
+        return char==='!';
+    }
     set(msg)
     {
-        if(msg.content[0]=='!')
-        {
-            this.data = msg;
-            this.args = msg.content;
-            this.fetchCommand(this.cmd, this.opt, this.args);
-        }
+        this.data = msg;
+        this.args = msg.content;
+        this.fetchCommand(this.cmd, this.opt, this.args);
     }
     fetchCommand(cmd, opt, args)
     {
         switch(cmd)
         {
-            case "help": Fetch.help(this, args[0]); break;
+            case "help":
+            // Fetch.help(this, args[0]);
+            this.execCmd(new CmdHelp(arg));
+            break;
             case "find":Fetch.find(this, opt, args); break;
             case "delete":Fetch.delete(this, opt, args); break;
             case "add":

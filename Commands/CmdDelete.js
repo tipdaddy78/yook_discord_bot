@@ -5,6 +5,10 @@ const msg = ['deleted','wrongop','notfound','noinput'];
 
 module.exports = class Delete extends Command
 {
+    constructor(usr, link, tag)
+    {
+
+    }
     static link(usr, link)
     {
         if(link)
