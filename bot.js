@@ -11,10 +11,11 @@ const auth = require('./auth.json');
 var bot = new Discord.Client();
 var input = new MessageParser();
 
+
 //Event listener for when bot successfully logs on
 bot.on('ready', (evt) =>
     {
-        logger.info('Connected: Logged in as:' + bot.user.username + ' id:' + bot.user.id);
+        logger.info(`Connected: Logged in as: ${bot.user.username}  id: ${bot.user.id}`);
     }
 );
 
@@ -22,7 +23,7 @@ bot.on('ready', (evt) =>
 //has access to. Don't worry, I'm not logging everyone's messages to the bot.
 bot.on('message', msg =>
     {
-        input.input = msg;
+        input.set(msg);
     }
 );
 
@@ -30,16 +31,16 @@ bot.on('message', msg =>
 //proper channel here.
 input.on('cmd', (e) =>
     {
-        logger.info(e.data.username + ' used ' + e.data.cmd);
-        selectChannel(e.ch, e.data, e.out);
+        logger.info(`${e.data.username} used !${e.data.cmd}`);
+        sendToChannel(e.ch, e.data, e.out);
     }
 );
 
 //Event listener for any errors thrown by a command.
 input.on('err', (e) =>
     {
-        logger.info(e.data.cmd + ' threw an error for ' + e.data.username + ':' + e.err);
-        selectChannel(e.ch, e.data, e.out);
+        logger.info(`${e.data.cmd} threw an error for ${e.data.username} :  ${e.err}`);
+        sendToChannel(e.ch, e.data, e.out);
     }
 );
 
@@ -50,7 +51,7 @@ process.on('uncaughtException', msg =>
 );
 
 //Utility function to select output channel for sending messages from the bot.
-function selectChannel(channel, data, output)
+function sendToChannel(channel, data, output)
 {
     switch(channel)
     {

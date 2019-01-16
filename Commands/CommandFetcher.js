@@ -3,6 +3,7 @@ const Find = require('./CmdFind.js');
 const Del = require('./CmdDelete.js');
 const Add = require('./CmdAdd.js');
 const logger = require('../Logger.js');
+var linksDB = require('../Database/Database.js');
 
 module.exports = class CommandFetcher
 {
@@ -20,23 +21,25 @@ module.exports = class CommandFetcher
     {
         let cmd = new Command(a?(a[0]=='!'?a.substring(1):a):'help');
         let out = ['Usage:'];
-        let i = 0;
         if(Command.exists(cmd.str))
         {
-            for(let h of cmd.help)
-            {
-                out.push(h);
-                i = ++h;
-            }
+            let roles = [];
+            let ch = [];
+            let clist = [];
             if(cmd.roles.length > 0)
             {
+                cmd.roles.forEach(r => roles.push(`\`${r}\``));
                 out.push('You must have one of these roles: ');
-                out.push('`' + cmd.roles + '`');
+                out.push(roles.join(', '));
             }
+            cmd.channels.forEach(c => ch.push(`\`${c}\``));
+            Command.list().forEach(c => clist.push(`\`${c}\``));
+
+            cmd.help.forEach(h => out.push(h));
             out.push('This command works in: ');
-            out.push(cmd.channels.join(', ') + ' channels');
+            out.push(`${ch.join(', ')} channels`);
             out.push('List of commands:');
-            out.push(Command.list().join(', '));
+            out.push(clist.join(', '));
             e.emit(
                 'cmd',
                 {
@@ -48,7 +51,7 @@ module.exports = class CommandFetcher
         }
         else
         {
-            Fetch.help(e, 'help');
+            CommandFetcher.help(e, 'help');
         }
     }
     static get(e, opt, name)
@@ -58,9 +61,9 @@ module.exports = class CommandFetcher
         switch(opt)
         {
             case 'link': case 'l': default:
-            if(e.db.exists(name))
+            if(linksDB.exists(name))
             {
-                let link = e.db.getEntry(name);
+                let link = linksDB.getEntry(name);
                 output.push('['+name+']'+'(<'+link.data+'>)');
                 output.push('tags: '+link.tags.join(', '));
                 output.push('Posted by ' + link.op);
@@ -85,10 +88,10 @@ module.exports = class CommandFetcher
         switch(opt)
         {
             case 'tags': case 'tag': case 't':
-            output = Find.tags(e.db.all, args);
+            output = Find.tags( args);
             break;
             case 'links': case 'link': case 'l': default:
-            output = Find.links(e.db.all, args);
+            output = Find.links(args);
             break;
         }
         if(output.length == 0)
@@ -113,39 +116,10 @@ module.exports = class CommandFetcher
             switch(opt)
             {
                 case 'tag': case 't':
-                output = Del.tag(e.db, e.data.username, args[0], args[1]);
+                output = Del.tag(e.data.username, args[0], args[1]);
                 break;
                 case 'link': case 'l': default:
-                output = Del.link(e.db, e.data.username, args[0]);
-                break;
-            }
-        }
-        else
-        {
-            output = 'nopermit';
-        }
-        return e.emit('cmd',
-            {
-                data:e.data,
-                ch:'re',
-                out:cmd.message(output)
-            }
-        );
-    }
-    static add(e, opt, args)
-    {
-        let cmd = new Command('add');
-        let output = '';
-        if(e.checkChannel(cmd.get())
-            && e.hasPermission(cmd.get()))
-        {
-            switch(opt)
-            {
-                case 'tags': case 'tag': case 't':
-                output = Add.tag(e.db, e.data.username, args);
-                break;
-                case 'link': case 'l': default:
-                output = Add.link(e.db, e.data.username, args);
+                output = Del.link(e.data.username, args[0]);
                 break;
             }
         }

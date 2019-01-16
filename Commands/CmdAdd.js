@@ -1,131 +1,78 @@
 const logger = require('../Logger.js');
 const Command = require('./Commands.js');
-const msg = ['added','overwrite','badlink','noedit','notfound','missingarg']
+var linksDB = require('../Database/Database.js');
 
 module.exports = class CmdAdd extends Command
 {
-    constructor(opt, db, usr, args)
+    constructor(args, usr)
     {
         super('add');
-        this.opt = opt;
-        this.db = db;
-        this.usr = usr;
         this.args = args;
+        this.usr = usr;
+        this.ch = 're';
     }
-    set args(args)
+    exit(exit_msg)
     {
-        if(args.length > 0)
+        return {ch:this.ch,msg:this.message(exit_msg)};
+    }
+    execute(opt)
+    {
+        if(this.args.length > 0)
         {
-            switch(this.opt)
+            switch(opt)
             {
                 case 'tags': case 'tag': case 't':
-                this.name = args[0];
-                this.tags = args.slice(1);
-                this.entry = this.db.getEntry(this.name);
-                break;
+                return this.addTags(this.args[0],this.args.slice(1),this.usr);
+
                 case 'link': case 'l': default:
-                this.name = args[1];
-                this.entry = this.createObj(args[0], args.slice(2), this.usr);
-                break;
+                return this.addLink(this.args[0],this.args[1],this.args.slice(2),this.usr);
             }
         }
-        else
-        {
-            this.msg = 'missingarg';
-        }
+        return this.exit('missingarg');
     }
-    createObj(link, tags, op)
+    toJSO(link,tags,op)
     {
         return {data:link,tags:tags,op:op};
     }
-    tags()
+    addTags(link, tags, usr)
     {
-
+        if(linksDB.exists(link))
+        {
+            let entry = linksDB.getEntry(link);
+            if(entry.op==usr)
+            {
+                let new_tags = entry.tags;
+                for(let t of tags)
+                {
+                    if(!new_tags.includes(t))
+                    {
+                        new_tags.push(t);
+                    }
+                }
+                linksDB.add(link, this.toJSO(entry.data, new_tags, usr));
+                return this.exit('overwrite');
+            }
+            return this.exit('noedit');
+        }
+        return this.exit('notfound');
     }
-    static tag(db, usr, args)
+    addLink(link, name, tags, op)
     {
-        if(args.length > 0)
+        if(link.startsWith('http://')
+            || link.startsWith('https://'))
         {
-            let link = args[0];
-            let tags = args.slice(1);
-            if(db.exists(link))
+            if(linksDB.exists(name))
             {
-                let entry = db.getEntry(link);
-                if(entry.op==usr)
+                if(linksDB.getEntry(name).op==op)
                 {
-                    let new_tags = entry.tags;
-                    for(let t of tags)
-                    {
-                        if(!new_tags.includes(t))
-                        {
-                            new_tags.push(t);
-                        }
-                    }
-                    db.add(link,
-                        {
-                            data:entry.data,
-                            tags:new_tags,
-                            op:entry.op
-                        }
-                    );
-                    return msg[1];
+                    linksDB.add(name, this.toJSO(link,tags,op));
+                    return this.exit('added');
                 }
-                else
-                {
-                    return msg[3];
-                }
+                return this.exit('noedit');
             }
-            else
-            {
-                return msg[4];
-            }
+            linksDB.add(name, this.toJSO(link,tags,op));
+            return this.exit('added');
         }
-        else
-        {
-            return msg[5];
-        }
-    }
-    static link(db, usr, args)
-    {
-        if(args.length > 0)
-        {
-            let link = args[0];
-            let name = args[1];
-            let tags = args.slice(2);
-            let value =
-            {
-                data:link,
-                tags:tags,
-                op:usr
-            };
-            if(link.startsWith('http'))
-            {
-                if(db.exists(name))
-                {
-                    if(db.getEntry(name).op==usr)
-                    {
-                        db.add(name, value);
-                        return msg[1];
-                    }
-                    else
-                    {
-                        return msg[3];
-                    }
-                }
-                else
-                {
-                    db.add(name, value);
-                    return msg[0];
-                }
-            }
-            else
-            {
-                return msg[2];
-            }
-        }
-        else
-        {
-            return msg[5];
-        }
+        return this.exit('badlink');
     }
 }

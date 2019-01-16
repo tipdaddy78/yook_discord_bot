@@ -1,7 +1,8 @@
 const EventEmitter = require('events');
-const Database = require('./Database/Database.js');
+// var LinksDB = require('./Database/Database.js');
 const Commands = require('./Commands/Commands.js');
 const Fetch = require('./Commands/CommandFetcher.js');
+const CmdAdd = require('./Commands/CmdAdd.js');
 const logger = require('./Logger.js');
 
 //Node.js export for use in other scripts
@@ -12,7 +13,6 @@ module.exports = class MessageParser extends EventEmitter {
     constructor()
     {
         super();
-        this.db = new Database();
     }
     set data(msg)
     {
@@ -25,39 +25,43 @@ module.exports = class MessageParser extends EventEmitter {
     }
     get data()
     {
-        let d =
-        {
+        return {
             msg:this.msg,
             usr:this.usr,
             username:this.username,
             roles:this.roles,
             channel:this.channel,
             ch_type:this.ch_type,
-            cmd:this.cmd,
-            opt:this.opt,
-            args:this.args
-        }
-        return d;
+            cmd:this.cmd
+        };
     }
     set args(a)
     {
         this.arg_list = {};
         this.arg_list.cmd = [];
-        let cmd = a.toLowerCase().split(' ')[0];
+        this.arg_list.args = [];
+
+        let toLC = (str) => str.toLowerCase();
+        let append = (arr, e) => this.arg_list[arr].push(e);
+        let substr = (c, s, e) => c.substring(s, e? e:c.length);
+
+        let cmd = toLC(a.split(' ')[0]);
+
         for(let c of Commands.list())
         {
             if(cmd.includes(c))
             {
-                this.arg_list.cmd.push(cmd.substring(1,c.length));
+                append('cmd', substr(cmd, 1, c.length));
                 if(cmd.length > c.length)
                 {
-                    this.arg_list.cmd.push(cmd.substring(c.length));
+                    append('cmd', substr(cmd, c.length));
                 }
+                break;
             }
         }
         if(a.trim().includes(' '))
         {
-            this.arg_list.args = a.substring(a.indexOf(' ')+1).toLowerCase().split(',');
+            this.arg_list.args = toLC(substr(a,a.indexOf(' ')+1)).split(',');
             for(let a in this.arg_list.args)
             {
                 this.arg_list.args[a] = this.arg_list.args[a].trim();
@@ -65,7 +69,6 @@ module.exports = class MessageParser extends EventEmitter {
         }
         else
         {
-            this.arg_list.args = [];
             logger.info('No arguments')
         }
     }
@@ -81,11 +84,11 @@ module.exports = class MessageParser extends EventEmitter {
     {
         return this.arg_list.cmd[1];
     }
-    set input(msg)
+    set(msg)
     {
-        this.data = msg;
         if(msg.content[0]=='!')
         {
+            this.data = msg;
             this.args = msg.content;
             this.fetchCommand(this.cmd, this.opt, this.args);
         }
@@ -97,8 +100,24 @@ module.exports = class MessageParser extends EventEmitter {
             case "help": Fetch.help(this, args[0]); break;
             case "find":Fetch.find(this, opt, args); break;
             case "delete":Fetch.delete(this, opt, args); break;
-            case "add":Fetch.add(this,opt,args); break;
+            case "add":
+            this.exeCmd(new CmdAdd(args, this.username));
+            break;
             case "get":Fetch.get(this,opt,args[0]); break;
+        }
+    }
+    exeCmd(cmd)
+    {
+        let data = {data:this.data};
+        if(this.checkChannel(cmd.get()))
+        {
+            if(this.hasPermission(cmd.get()))
+            {
+                let output = cmd.execute(this.opt);
+                data.ch = output.ch;
+                data.out = output.msg;
+                this.emit('cmd', data);
+            }
         }
     }
     //Returns specified role of member if member contains it

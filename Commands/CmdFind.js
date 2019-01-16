@@ -1,54 +1,57 @@
 const logger = require('../Logger.js');
+var linksDB = require('../Database/Database.js');
 
 module.exports = class Find
 {
-    static links(db, keywds)
+    static links(keywds)
     {
         let out = [];
         let tmp_db = {};
-        for(let k in db)
+        linksDB.forall(k =>
         {
-            for(let t of db[k].tags)
+            linksDB.getEntry(k).tags.forEach(t =>
             {
-                for(let w of keywds)
+                keywds.forEach(w =>
                 {
                     if(t.includes(w) || k.includes(w))
                     {
-                        tmp_db[k] = db[k];
+                        tmp_db[k] = linksDB.getEntry(k);
                     }
-                }
-            }
-        }
+                });
+            });
+        });
         for(let k in tmp_db)
         {
-            out.push('[' + k + '](<' + tmp_db[k].data
-                + '>) Posted by ' + tmp_db[k].op
-                + '\ntags: ' + tmp_db[k].tags);
+            out.push(`[${k}](<${tmp_db[k].data}>)`
+                + `\nPosted by ${tmp_db[k].op}`
+                + `\ntags: ${tmp_db[k].tags}`);
         }
         out.sort();
         return out;
     }
-    static tags(db, keywds)
+    static tags(keywds)
     {
         let out = [];
-        for(let k in db)
+        linksDB.foreach(link =>
         {
-            for(let t of db[k].tags)
+            link.tags.forEach(t =>
             {
-                for(let w of keywds)
-                {
-                    if((t.includes(w))
-                        && !out.includes(t))
-                    {
-                        out.push(t);
-                    }
-                }
                 if(keywds.length == 0 && !out.includes(t))
                 {
                     out.push(t);
                 }
-            }
-        }
+                else
+                {
+                    keywds.forEach(w =>
+                    {
+                        if(t.includes(w) && !out.includes(t))
+                        {
+                            out.push(t);
+                        }
+                    });
+                }
+            });
+        });
         out.sort();
         return out.join(', ');
     }

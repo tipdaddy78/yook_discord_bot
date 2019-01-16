@@ -1,16 +1,9 @@
 {
-    "invalid":{
-        "roles":[],
-        "channels":["dm","text","group"],
-        "servers":[],
-        "help":[
-            "Command not found."
-        ]
-    },
     "help":{
         "roles":[],
         "channels":["dm","text","group"],
         "servers":[],
+        "options":[],
         "help":[
             "```!help command```"
         ],

@@ -1,17 +1,19 @@
+const Command = require('./Commands.js');
 const logger = require('../Logger.js');
+var linksDB = require('../Database/Database.js');
 const msg = ['deleted','wrongop','notfound','noinput'];
 
-module.exports = class Delete
+module.exports = class Delete extends Command
 {
-    static link(db, usr, link)
+    static link(usr, link)
     {
         if(link)
         {
-            if(db.exists(link))
+            if(linksDB.exists(link))
             {
-                if(db.getEntry(link).op==usr)
+                if(linksDB.getEntry(link).op==usr)
                 {
-                    db.delete(link)
+                    linksDB.delete(link)
                     return msg[0];
                 }
                 else
@@ -29,17 +31,17 @@ module.exports = class Delete
             return msg[3];
         }
     }
-    static tag(db, usr, link, tag)
+    static tag(usr, link, tag)
     {
         if(link && tag)
         {
-            if(db.exists(link))
+            if(linksDB.exists(link))
             {
-                if(db.getEntry(link).op==usr)
+                let tmp_entry = linksDB.getEntry(link);
+                if(tmp_entry.op==usr)
                 {
-                    if(db.getEntry(link).tags.includes(tag))
+                    if(tmp_entry.tags.includes(tag))
                     {
-                        let tmp_entry = db.getEntry(link);
                         tmp_entry.tags.splice(tmp_entry.tags.indexOf(tag),1);
                         db.add(link,tmp_entry);
                         return msg[0];

@@ -41,10 +41,7 @@ module.exports = class Command
         let out = [];
         for(let c in cmdList)
         {
-            if(c != 'invalid')
-            {
-                out.push('!' + c);
-            }
+            out.push(`!${c}`);
         }
         return out;
     }
