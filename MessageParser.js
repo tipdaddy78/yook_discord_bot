@@ -26,6 +26,7 @@ module.exports = class MessageParser extends EventEmitter {
     set data(msg)
     {
         this.msg = msg;
+        this.server = msg.guild;
         this.usr = msg.author;
         this.username = msg.author.username;
         this.roles = (msg.member)? msg.member.roles:[];
@@ -81,6 +82,9 @@ module.exports = class MessageParser extends EventEmitter {
     }
     command()
     {
+        logger.info(`Command sent in ${this.server.name} server`);
+        logger.info(`Owner id is ${this.server.owner.id}`);
+        logger.info(`User id is ${this.usr.id}`);
         switch(this.cmd)
         {
             case "help":
@@ -88,7 +92,7 @@ module.exports = class MessageParser extends EventEmitter {
             case "find":
             return new CmdFind(this.args);
             case "delete":
-            return new CmdDelete(this.username, this.args[0], this.args[1]);
+            return new CmdDelete(this.username, this.args);
             case "add":
             return new CmdAdd(this.args, this.username);
             case "get":
@@ -103,7 +107,7 @@ module.exports = class MessageParser extends EventEmitter {
             let data = {data:this.data,ch:'ch'};
             if(cmd.channels.includes(this.ch_type))
             {
-                if(this.ch_type == 'dm'
+                if(this.ch_type == 'dm' || this.server.owner.id === this.usr.id
                 || this.roles.some(r => cmd.roles.includes(r.name)))
                 {
                     let output = cmd.execute(this.opt);

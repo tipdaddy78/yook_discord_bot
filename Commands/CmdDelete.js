@@ -4,12 +4,12 @@ var linksDB = require('../Database/Database.js');
 
 module.exports = class Delete extends Command
 {
-    constructor(usr, link, tag)
+    constructor(usr, args)
     {
         super('delete');
         this.usr = usr;
-        this.link = link;
-        this.tag = tag?tag:null;
+        this.link = args[0];
+        this.tags = args.length>1?args.slice(1):[];
         this.ch = 'ch';
     }
     execute(opt)
@@ -20,14 +20,14 @@ module.exports = class Delete extends Command
         entry = entry[1];
         switch(opt)
         {
-            case 'tag': case 't':
-            let t_regex = new RegExp(this.tag, 'i');
-            let tag = entry.tags.find(t => t.match(t_regex));
-            return  (this.link && this.tag)?
+            case 'tags': case 'tag': case 't':
+            let t_regex = this.tags.map(t => new RegExp(t,'i'));
+            let tags = entry.tags.filter(t => t_regex.some(r => t.match(r)));
+            return  (this.link && this.tags.length)?
                     key?
                     entry.op==this.usr?
-                    tag?
-                    this.deleteTag(key,entry,tag)
+                    tags.length?
+                    this.deleteTags(key,entry,tags)
                     : this.exit('notfound')
                     : this.exit('wrongop')
                     : this.exit('notfound')
@@ -51,9 +51,9 @@ module.exports = class Delete extends Command
         linksDB.delete(link);
         return this.exit('deleted');
     }
-    deleteTag(link,entry,tag)
+    deleteTags(link,entry,tags)
     {
-        entry.tags.splice(entry.tags.indexOf(tag),1);
+        entry.tags = entry.tags.filter(t => !tags.includes(t));
         linksDB.add(link,entry);
         return this.exit('deleted');
     }

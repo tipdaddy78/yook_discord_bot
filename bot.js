@@ -35,6 +35,7 @@ bot.on('message', msg =>
 // Create an event listener for new guild members
 bot.on('guildMemberAdd', member =>
     {
+        logger.info(`${member} has joined the ${member.guild.name} server!`)
         // Send the message to a designated channel on a server:
         const channel = member.guild.channels.find(ch => ch.name === 'newcomers' || ch.name === 'testing');
         // Do nothing if the channel wasn't found on this server

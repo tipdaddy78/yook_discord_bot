@@ -11,31 +11,6 @@ class Database
         this.filepath = filepath;
         this.array = json;
     }
-    // //Checks existence of key by exact string match
-    // //
-    // exists(key)
-    // {
-    //     return this.db.hasOwnProperty(key);
-    // }
-    // //Returns the value held at the specified location in the JSON object
-    // //
-    // getEntry(key)
-    // {
-    //     return this.db[key];
-    // }
-    // //Returns the key that returns a match from the regex defined by the
-    // //specified string. Unfortunately, there isn't a simpler way to compare
-    // //strings with no case sensitivity in javascript.
-    // //
-    // getKey(key)
-    // {
-    //     let regex = new RegExp(key, 'i');
-    //     for(let k in this.db)
-    //     {
-    //         if(k.match(regex)) return k;
-    //     }
-    //     return null;
-    // }
     //This edits the JSON by adding a new key-value pair by appending, or
     //overwriting it in the file.
     //
