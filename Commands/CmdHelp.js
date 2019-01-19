@@ -2,10 +2,10 @@ const Command = require('./Commands.js');
 
 module.exports = class CmdHelp extends Command
 {
-    constructor(arg)
+    constructor(args)
     {
         super('help');
-        this.cmd = arg.toLowerCase();
+        this.cmd = args[0].toLowerCase();
         this.ch = 'dm';
     }
     set cmd(cmd)
@@ -33,7 +33,7 @@ module.exports = class CmdHelp extends Command
             out.push(`${ch.join(', ')} channels\n`);
             if(this.cmd.roles.length > 0)
             {
-                let roles = this.cmd.roles.map(r => `\`${r}\``)
+                let roles = this.cmd.roles.map(r => `\`${r}\``);
                 out.push('You must have one of these roles: ');
                 out.push(`${roles.join(', ')}\n`);
             }

@@ -4,7 +4,7 @@ var linksDB = require('../Database/Database.js');
 
 module.exports = class CmdAdd extends Command
 {
-    constructor(args, usr)
+    constructor(usr, args)
     {
         super('add');
         this.args = args;
@@ -15,7 +15,7 @@ module.exports = class CmdAdd extends Command
     {
         return {ch:this.ch,msg:this.message(exit_msg)};
     }
-    execute(opt)
+    execute(opt, isOwner)
     {
         let link, name, tags;
         switch(opt)
@@ -24,7 +24,7 @@ module.exports = class CmdAdd extends Command
             link = this.args[0];
             tags = this.args.slice(1);
             return  link && tags.length?
-                    this.addTags(link, tags, this.usr)
+                    this.addTags(link, tags, this.usr, isOwner)
                     : this.exit('missingarg');
 
             case 'link': case 'l': default:
@@ -32,13 +32,13 @@ module.exports = class CmdAdd extends Command
             name = this.args[1];
             tags = this.args.slice(2);
             return  link && name && tags.length?
-                    this.addLink(link, name, tags, this.usr)
+                    this.addLink(link, name, tags, this.usr, isOwner)
                     : this.exit('missingarg');
         }
     }
-    addTags(link, tags, usr)
+    addTags(link, tags, usr, isOwner)
     {
-        let l_regex = new RegExp(link,'i');
+        let l_regex = new RegExp('^' + link + '\\b','i');
         let entry = linksDB.find(k => k.match(l_regex));
         let key = entry[0];
         entry = entry[1];
@@ -58,21 +58,21 @@ module.exports = class CmdAdd extends Command
         }
 
         return  key?
-                entry.op==usr?
+                entry.op==usr || isOwner?
                 this.add(key,new_entry(),'overwrite')
                 : this.exit('noedit')
                 : this.exit('notfound');
     }
-    addLink(link, name, tags, usr)
+    addLink(link, name, tags, usr, isOwner)
     {
-        let regex = new RegExp(name,'i');
+        let regex = new RegExp('^' + name + '\\b','i');
         let entry = linksDB.find(k => k.match(regex));
         let key = entry[0];
         entry = entry[1];
 
         return  link.search(/\bhttps?:\/\//) != -1?
                 key?
-                entry.op==usr?
+                entry.op==usr || isOwner?
                 this.add(key, {data:link,tags:tags,op:usr},'overwrite')
                 : this.exit('noedit')
                 : this.add(name, {data:link,tags:tags,op:usr},'added')

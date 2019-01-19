@@ -4,14 +4,14 @@ var linksDB = require('../Database/Database.js');
 
 module.exports = class CmdGet extends Command
 {
-    constructor(link)
+    constructor(args)
     {
         super('get');
-        this.link = link;
+        this.link = args[0];
     }
     execute(opt)
     {
-        let regex = new RegExp(this.link,'i');
+        let regex = new RegExp('^' + this.link + '\\b','i');
         let entry = linksDB.find(k => k.match(regex));
         let key = entry[0];
         entry = entry[1];

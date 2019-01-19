@@ -34,11 +34,18 @@ module.exports = class CmdFind extends Command
                 return tag.match(regex) || key.match(regex);
             }));
         });
+        out.sort((a,b) =>
+        {
+            let varA = a[0].toUpperCase();
+            let varB = b[0].toUpperCase();
+            if(varA > varB) return -1;
+            if(varA < varB) return 1;
+            return 0;
+        });
         out = out.map(entry =>
             (`[${entry[0]}](<${entry[1].data}>)`
             + `\nPosted by ${entry[1].op}`
-            + `\ntags: ${entry[1].tags}`));
-        out.sort();
+            + `\ntags: ${entry[1].tags.join(', ')}\n`));
         return out.length? out : this.message('notfound');
     }
     tags()
@@ -55,7 +62,14 @@ module.exports = class CmdFind extends Command
             }));
             out = out.concat(tags.filter(t => !out.includes(t)));
         });
-        out.sort();
+        out.sort((a,b) =>
+        {
+            let varA = a.toUpperCase();
+            let varB = b.toUpperCase();
+            if(varA > varB) return 1;
+            if(varA < varB) return -1;
+            return 0;
+        });
         return out.length? out.join(', ') : this.message('notfound');
     }
 }

@@ -82,19 +82,20 @@ module.exports = class MessageParser extends EventEmitter {
     }
     command()
     {
-        logger.info(`Command sent in ${this.server.name} server`);
+        if(this.server)
+            logger.info(`Command sent in ${this.server.name} server`);
         switch(this.cmd)
         {
             case "help":
-            return new CmdHelp(this.args[0]);
+            return new CmdHelp(this.args);
             case "find":
             return new CmdFind(this.args);
             case "delete":
             return new CmdDelete(this.username, this.args);
             case "add":
-            return new CmdAdd(this.args, this.username);
+            return new CmdAdd(this.username, this.args);
             case "get":
-            return new CmdGet(this.args[0]);
+            return new CmdGet(this.args);
         }
         return null;
     }
@@ -103,12 +104,16 @@ module.exports = class MessageParser extends EventEmitter {
         if(cmd)
         {
             let data = {data:this.data,ch:'ch'};
+            let isOwner = this.ch_type!='dm'?
+                this.server.owner.id === this.usr.id
+                : false;
+            logger.info(`User is owner: ${isOwner}`);
             if(cmd.channels.includes(this.ch_type))
             {
-                if(this.ch_type == 'dm' || this.server.owner.id === this.usr.id
+                if(this.ch_type == 'dm' || isOwner
                 || this.roles.some(r => cmd.roles.includes(r.name)))
                 {
-                    let output = cmd.execute(this.opt);
+                    let output = cmd.execute(this.opt, isOwner);
                     data.ch = output.ch;
                     data.out = output.msg;
                 }

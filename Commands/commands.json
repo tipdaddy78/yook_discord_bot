@@ -53,7 +53,7 @@
             "notfound":"No link by that name in database.",
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",
-                "Separate arguments by a comma followed by a space: `arg1, arg2`",
+                "Separate arguments by a comma: `https://link, my link name, first tag, ...`",
                 "For more info, use `!help add`"
             ]
         }
@@ -64,8 +64,8 @@
         "servers":[],
         "help":[
             "```!find keyword 1, keyword 2, ..., last keyword```",
-            "-Find will return any links whose names or tags contain any of the keyword terms",
-            "-Keyword terms may have spaces, but this will limit your search\n",
+            "-Find will return any links whose names or tags contain any of the keywords",
+            "-Keywords may have spaces, but this will limit your search\n",
             "**Options**",
             "`!findlinks` or `!findlink` or `!findl` may be used optionally to specify a search for links",
             "`!findtags` or `!findtag` or `!findt` may be used to optionally specify a search for tags",
@@ -88,9 +88,9 @@
             "-Link names may contain spaces and are NOT case sensitive",
             "-This command cannot be undone, and takes effect immediately\n",
             "**Options**",
-            "`!deletelinks` or `!deletelink` or `!deletel` may be used optionally to specify deletion of a link",
-            "`!deletetag` or `!deletet` may be used to optionally specify deletion of a single tag within a link",
-            "Unsupported options will be ignored. Command will still execute links deletion by default.\n"
+            "`!deletelink` or `!deletel` may be used optionally to specify deletion of a link",
+            "`!deletetags` or `!deletetag` or `!deletet` may be used to optionally specify deletion of a list of tags within a link",
+            "*NOTE: The rule that all links must have at least one tag is enforced.*\n"
         ],
         "message":{
             "deleted":"Successfully deleted entry.",

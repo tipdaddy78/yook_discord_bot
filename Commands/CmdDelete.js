@@ -9,10 +9,10 @@ module.exports = class Delete extends Command
         super('delete');
         this.usr = usr;
         this.link = args[0];
-        this.tags = args.length>1?args.slice(1):[];
+        this.tags = args.slice(1);
         this.ch = 'ch';
     }
-    execute(opt)
+    execute(opt, isOwner)
     {
         let l_regex = new RegExp(this.link, 'i');
         let entry = linksDB.find(k => k.match(l_regex));
@@ -25,7 +25,7 @@ module.exports = class Delete extends Command
             let tags = entry.tags.filter(t => t_regex.some(r => t.match(r)));
             return  (this.link && this.tags.length)?
                     key?
-                    entry.op==this.usr?
+                    entry.op==this.usr || isOwner?
                     tags.length?
                     this.deleteTags(key,entry,tags)
                     : this.exit('notfound')
@@ -35,7 +35,7 @@ module.exports = class Delete extends Command
             case 'link': case 'l': default:
             return  this.link?
                     key?
-                    entry.op==this.usr?
+                    entry.op==this.usr || isOwner?
                     this.deleteLink(key)
                     : this.exit('wrongop')
                     : this.exit('notfound')
