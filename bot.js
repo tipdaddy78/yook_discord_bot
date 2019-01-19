@@ -11,10 +11,11 @@ const auth = require('./auth.json');
 var bot = new Discord.Client();
 var input = new MessageParser();
 
+
 //Event listener for when bot successfully logs on
 bot.on('ready', (evt) =>
     {
-        logger.info('Connected: Logged in as:' + bot.user.username + ' id:' + bot.user.id);
+        logger.info(`Connected: Logged in as: ${bot.user.username}  id: ${bot.user.id}`);
     }
 );
 
@@ -22,7 +23,12 @@ bot.on('ready', (evt) =>
 //has access to. Don't worry, I'm not logging everyone's messages to the bot.
 bot.on('message', msg =>
     {
-        cmd.input = msg;
+        if(input.isCommand(msg.content[0]))
+        {
+            input.set(msg);
+            let cmd = input.command();
+            input.execute(cmd);
+        }
     }
 );
 
@@ -30,27 +36,28 @@ bot.on('message', msg =>
 //proper channel here.
 input.on('cmd', (e) =>
     {
-        logger.info(e.data.username + ' used ' + e.data.cmd);
-        selectChannel(e.ch, e.data, e.out);
+        logger.info(`${e.data.username} used !${e.data.cmd}`);
+        sendToChannel(e.ch, e.data, e.out);
     }
 );
 
 //Event listener for any errors thrown by a command.
 input.on('err', (e) =>
     {
-        logger.info(e.data.cmd + ' threw an error for ' + e.data.username + ':' + e.err);
-        selectChannel(e.ch, e.data, e.out);
+        logger.info(`${e.data.cmd} threw an error for ${e.data.username} :  ${e.err}`);
+        sendToChannel(e.ch, e.data, e.out);
     }
 );
 
 process.on('uncaughtException', msg =>
     {
-        logger.error(msg);
+        logger.errToFile(msg);
+        logger.errToConsole('Bot crashed. Check crash.log');
     }
 );
 
 //Utility function to select output channel for sending messages from the bot.
-function selectChannel(channel, data, output)
+function sendToChannel(channel, data, output)
 {
     switch(channel)
     {

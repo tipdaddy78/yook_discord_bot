@@ -1,16 +1,9 @@
 {
-    "invalid":{
-        "roles":[],
-        "channels":["dm","text","group"],
-        "servers":[],
-        "help":[
-            "Command not found."
-        ]
-    },
     "help":{
-        "roles":[],
+        "roles":["@everyone"],
         "channels":["dm","text","group"],
         "servers":[],
+        "options":[],
         "help":[
             "```!help command```"
         ],
@@ -19,14 +12,14 @@
         }
     },
     "get":{
-        "roles":[],
+        "roles":["@everyone"],
         "channels":["dm","text","group"],
         "servers":[],
         "help":[
             "```!get name```",
             "-Returns the link with the matching name\n",
             "**Options**",
-            "`!getlink` or `!getl` perform default function"
+            "`!getlink` or `!getl` perform default function\n"
         ],
         "message":{
             "notfound":"No link with that name in the database"
@@ -54,9 +47,9 @@
         "message":{
             "added":"Link added!",
             "overwrite":"Link has been edited!",
-            "nopermit":"This command can only be used in permitted channels with permitted roles.",
+            "nopermit":"This command can only be used in permitted channels by members with permitted roles.",
             "badlink":"Only links beginning with http or https allowed!",
-            "noedit":"Only OP can overwrite or edit their own links!",
+            "noedit":"Only OP can overwrite, edit or delete their own links!",
             "notfound":"No link by that name in database.",
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",
@@ -66,8 +59,8 @@
         }
     },
     "find":{
-        "roles":[],
-        "channels":["dm"],
+        "roles":["@everyone"],
+        "channels":["dm","text","group"],
         "servers":[],
         "help":[
             "```!find keyword 1, keyword 2, ..., last keyword```",

@@ -1,13 +1,11 @@
 const fs = require('fs');
-const filepath = './links.json';
-const json = require(filepath);
 const logger = require('../Logger.js');
 
 
 //Database class represents a JSON file which may be read from and written to
-module.exports = class Database
+class Database
 {
-    constructor()
+    constructor(json, filepath)
     {
         this.db = json;
         this.filepath = filepath;
@@ -48,12 +46,32 @@ module.exports = class Database
         }
         return 0;
     }
+    forall(callback)
+    {
+        for(let key in this.db)
+        {
+            callback(key);
+        }
+    }
+    foreach(callback)
+    {
+        for(let key in this.db)
+        {
+            callback(key, this.db[key]);
+        }
+    }
     updateDB()
     {
         fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) =>
             {
+                logger.info(`Updating DB`);
                 if(err) throw err;
             }
         );
     }
 }
+
+const file = './Database/links.json';
+const db = require('./links.json');
+var linksDB = new Database(db, file);
+module.exports = linksDB;

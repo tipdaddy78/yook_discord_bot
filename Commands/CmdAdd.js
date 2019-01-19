@@ -1,92 +1,67 @@
 const logger = require('../Logger.js');
-const msg = ['added','overwrite','badlink','noedit','notfound','missingarg']
+const Command = require('./Commands.js');
+var linksDB = require('../Database/Database.js');
 
-module.exports = class Add
+module.exports = class CmdAdd extends Command
 {
-    static tag(db, usr, args)
+    constructor(args, usr)
     {
-        if(args.length > 0)
-        {
-            let link = args[0];
-            let tags = args.slice(1);
-            let entry = db.getEntry(link);
-            if(entry.op==usr)
-            {
-                if(db.exists(link))
-                {
-                    let new_tags = entry.tags;
-                    for(let t of tags)
-                    {
-                        if(!new_tags.includes(t))
-                        {
-                            new_tags.push(t);
-                        }
-                    }
-                    db.add(link,
-                        {
-                            data:entry.data,
-                            tags:new_tags,
-                            op:entry.op
-                        }
-                    );
-                    return msg[1];
-                }
-                else
-                {
-                    return msg[4];
-                }
-            }
-            else
-            {
-                return msg[3];
-            }
-        }
-        else
-        {
-            return msg[5];
-        }
+        super('add');
+        this.args = args;
+        this.usr = usr;
+        this.ch = 're';
     }
-    static link(db, usr, args)
+    exit(exit_msg)
     {
-        if(args.length > 0)
+        return {ch:this.ch,msg:this.message(exit_msg)};
+    }
+    execute(opt)
+    {
+        if(this.args.length > 0)
         {
-            let link = args[0];
-            let name = args[1];
-            let tags = args.slice(2);
-            let value =
+            switch(opt)
             {
-                data:link,
-                tags:tags,
-                op:usr
-            };
-            if(link.startsWith('http'))
-            {
-                if(db.exists(name))
-                {
-                    if(db.getEntry(name).op==usr)
-                    {
-                        db.add(name, value);
-                        return msg[1];
-                    }
-                    else
-                    {
-                        return msg[3];
-                    }
-                }
-                else
-                {
-                    db.add(name, value);
-                    return msg[0];
-                }
-            }
-            else
-            {
-                return msg[2];
+                case 'tags': case 'tag': case 't':
+                return this.addTags(this.args[0],this.args.slice(1),this.usr);
+
+                case 'link': case 'l': default:
+                return this.addLink(this.args[0],this.args[1],this.args.slice(2),this.usr);
             }
         }
-        else
+        return this.exit('missingarg');
+    }
+    toJSO(link,tags,op)
+    {
+        return {data:link,tags:tags,op:op};
+    }
+    addTags(link, tags, usr)
+    {
+        let addTags = (entry) =>
         {
-            return msg[5];
+            entry.tags = entry.tags.concat(tags.filter(t => !entry.tags.includes(t)));
+            linksDB.add(link, entry);
+            return this.exit('overwrite');
         }
+        return  linksDB.exists(link)?
+                linksDB.getEntry(link).op==usr?
+                addTags(linksDB.getEntry(link))
+                : this.exit('noedit')
+                : this.exit('notfound');
+    }
+    addLink(link, name, tags, op)
+    {
+        let add = () => this.add(name, this.toJSO(link, tags, op));
+        return  link.search(/\bhttps?:\/\//) != -1?
+                linksDB.exists(name)?
+                linksDB.getEntry(name).op==op?
+                add()
+                : this.exit('noedit')
+                : add()
+                : this.exit('badlink');
+    }
+    add(key, value)
+    {
+        linksDB.add(key, value);
+        return this.exit('added');
     }
 }
