@@ -26,19 +26,18 @@ module.exports = class CmdFind extends Command
     }
     links()
     {
-        let out = [];
-        let tmp_db = {};
-
-        linksDB.foreach((key, entry) =>
+        let out = linksDB.filter((key,entry) =>
         {
-            if(entry.tags.some(tag => this.keywords.some(w =>
-                tag.includes(w) || key.includes(w))))
+            return entry.tags.some(tag => this.keywords.some(w =>
             {
-                out.push(`[${key}](<${entry.data}>)`
-                    + `\nPosted by ${entry.op}`
-                    + `\ntags: ${entry.tags}`)
-            }
+                let regex = new RegExp(w,'i');
+                return tag.match(regex) || key.match(regex);
+            }));
         });
+        out = out.map(entry =>
+            (`[${entry[0]}](<${entry[1].data}>)`
+            + `\nPosted by ${entry[1].op}`
+            + `\ntags: ${entry[1].tags}`));
         out.sort();
         return out.length? out : this.message('notfound');
     }
@@ -46,13 +45,16 @@ module.exports = class CmdFind extends Command
     {
         let out = [];
 
-        linksDB.foreach((k, link) =>  link.tags.forEach(t =>
+        linksDB.foreach((k,link) =>
         {
-            if(this.keywords.some(w => t.includes(w) && !out.includes(t)))
+            let tags = link.tags.filter(t => !this.keywords.length
+            || this.keywords.some(w =>
             {
-                out.push(t)
-            }
-        }));
+                let w_regex = new RegExp(w, 'i');
+                return t.match(w_regex);
+            }));
+            out = out.concat(tags.filter(t => !out.includes(t)));
+        });
         out.sort();
         return out.length? out.join(', ') : this.message('notfound');
     }

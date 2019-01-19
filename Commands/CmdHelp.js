@@ -5,7 +5,7 @@ module.exports = class CmdHelp extends Command
     constructor(arg)
     {
         super('help');
-        this.cmd = arg;
+        this.cmd = arg.toLowerCase();
         this.ch = 'dm';
     }
     set cmd(cmd)

@@ -11,10 +11,14 @@ module.exports = class CmdGet extends Command
     }
     execute(opt)
     {
+        let regex = new RegExp(this.link,'i');
+        let entry = linksDB.find(k => k.match(regex));
+        let key = entry[0];
+        entry = entry[1];
         switch(opt)
         {
             case 'link': case 'l': default:
-            return  this.exit(this.output(this.link, linksDB.getEntry(this.link)));
+            return  this.exit(this.output(key, entry));
         }
     }
     exit(msg)
@@ -23,10 +27,10 @@ module.exports = class CmdGet extends Command
     }
     output(key, value)
     {
-        return  linksDB.exists(key)?
-                (`[${key}](<${value.data})`
+        return  key && value?
+                (`[${key}](${value.data})`
                 + `\nPosted by ${value.op}`
-                + `\ntags: ${value.tags.join(', ')}}`)
+                + `\ntags: ${value.tags.join(', ')}`)
                 : this.message('notfound');
     }
 }

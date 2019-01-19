@@ -32,6 +32,19 @@ bot.on('message', msg =>
     }
 );
 
+// Create an event listener for new guild members
+bot.on('guildMemberAdd', member =>
+    {
+        // Send the message to a designated channel on a server:
+        const channel = member.guild.channels.find(ch => ch.name === 'newcomers' || ch.name === 'testing');
+        // Do nothing if the channel wasn't found on this server
+        if (!channel) return;
+        // Send the message, mentioning the member
+        channel.send(`Welcome to the server, ${member}!`);
+    }
+);
+
+
 //Event listener for anytime a command is used. Output message gets sent to
 //proper channel here.
 input.on('cmd', (e) =>
