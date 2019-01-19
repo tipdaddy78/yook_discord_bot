@@ -53,8 +53,16 @@ module.exports = class Delete extends Command
     }
     deleteTags(link,entry,tags)
     {
-        entry.tags = entry.tags.filter(t => !tags.includes(t));
-        linksDB.add(link,entry);
-        return this.exit('deleted');
+        let new_tags = entry.tags.filter(t => !tags.includes(t));
+        if(new_tags.length)
+        {
+            entry.tags = new_tags;
+            linksDB.add(link,entry);
+            return this.exit('deleted');
+        }
+        else
+        {
+            return this.exit('noedit');
+        }
     }
 }

@@ -83,8 +83,6 @@ module.exports = class MessageParser extends EventEmitter {
     command()
     {
         logger.info(`Command sent in ${this.server.name} server`);
-        logger.info(`Owner id is ${this.server.owner.id}`);
-        logger.info(`User id is ${this.usr.id}`);
         switch(this.cmd)
         {
             case "help":

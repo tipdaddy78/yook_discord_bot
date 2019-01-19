@@ -97,7 +97,8 @@
             "wrongop":"Only OP can edit or delete their own links.",
             "nopermit":"This command can only be used in permitted channels by members with permitted roles.",
             "notfound":"That entry was not found in the database.",
-            "noinput":"Please enter the name of what you want to delete."
+            "noinput":"Please enter the name of what you want to delete.",
+            "noedit":"Link must have at least one tag for searching."
         }
     }
 }
