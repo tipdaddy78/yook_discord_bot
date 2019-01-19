@@ -55,7 +55,7 @@ module.exports = class Command
         let out = [];
         for(let c in cmdList)
         {
-            out.push(`!${c}`);
+            out.push(c);
         }
         return out;
     }

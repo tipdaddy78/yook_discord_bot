@@ -57,20 +57,21 @@ class Database
     {
         for(let key in this.db)
         {
-            callback(this.db[key]);
+            callback(key, this.db[key]);
         }
     }
     updateDB()
     {
         fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) =>
             {
+                logger.info(`Updating DB`);
                 if(err) throw err;
             }
         );
     }
 }
 
-const file = './links.json';
-const db = require(file);
+const file = './Database/links.json';
+const db = require('./links.json');
 var linksDB = new Database(db, file);
 module.exports = linksDB;

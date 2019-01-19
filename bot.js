@@ -26,6 +26,8 @@ bot.on('message', msg =>
         if(input.isCommand(msg.content[0]))
         {
             input.set(msg);
+            let cmd = input.command();
+            input.execute(cmd);
         }
     }
 );
@@ -49,7 +51,8 @@ input.on('err', (e) =>
 
 process.on('uncaughtException', msg =>
     {
-        logger.error(msg);
+        logger.errToFile(msg);
+        logger.errToConsole('Bot crashed. Check crash.log');
     }
 );
 

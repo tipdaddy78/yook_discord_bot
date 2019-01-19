@@ -12,7 +12,7 @@ module.exports = class CmdHelp extends Command
     {
         this.command = cmd?
             new Command(cmd[0]==='!'?
-            cmd.substring(1) : cmd);
+            cmd.substring(1) : cmd)
             : this;
     }
     get cmd()
@@ -23,20 +23,22 @@ module.exports = class CmdHelp extends Command
     {
         if(Command.exists(this.cmd.str))
         {
-            let out = roles = ch = clist = [];
+            let out =  ['**Usage:**'];
+            this.cmd.help.forEach(h => out.push(h));
+
+            let ch = this.cmd.channels.map(c => `\`${c}\``);
+            let clist = Command.list().map(cmd => `\`!${cmd}\``);
+
+            out.push('This command works in:');
+            out.push(`${ch.join(', ')} channels\n`);
             if(this.cmd.roles.length > 0)
             {
-                this.cmd.roles.forEach(r => roles.push(`\`${r}\``));
+                let roles = this.cmd.roles.map(r => `\`${r}\``)
                 out.push('You must have one of these roles: ');
-                out.push(roles.join(', '));
+                out.push(`${roles.join(', ')}\n`);
             }
-            this.cmd.channels.forEach(c => ch.push(`\`${c}\``));
-            Command.list().forEach(c => clist.push(`\`${c}\``));
-            this.cmd.help.forEach(h => out.push(h));
-            out.push('This command works in:');
-            out.push(`${ch.join(', ')} channels`);
             out.push('List of commands:');
-            out.push(clist.join(', '));
+            out.push(`${clist.join(', ')}`);
             return this.exit(out);
         }
         else

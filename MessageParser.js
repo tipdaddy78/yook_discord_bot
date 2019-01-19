@@ -1,9 +1,10 @@
 const EventEmitter = require('events');
-// var LinksDB = require('./Database/Database.js');
 const Commands = require('./Commands/Commands.js');
-const Fetch = require('./Commands/CommandFetcher.js');
 const CmdAdd = require('./Commands/CmdAdd.js');
 const CmdHelp = require('./Commands/CmdHelp.js');
+const CmdDelete = require('./Commands/CmdDelete.js');
+const CmdFind = require('./Commands/CmdFind.js');
+const CmdGet = require('./Commands/CmdGet.js');
 const logger = require('./Logger.js');
 
 //Node.js export for use in other scripts
@@ -15,12 +16,19 @@ module.exports = class MessageParser extends EventEmitter {
     {
         super();
     }
+    set(msg)
+    {
+        this.data = msg;
+        this.arg_list = {cmd:'',opt:'',args:[]};
+        this.cmd = msg.content.match(/^!([a-z]+\b)/i)[1];
+        this.args = msg.content.trim();
+    }
     set data(msg)
     {
         this.msg = msg;
         this.usr = msg.author;
         this.username = msg.author.username;
-        this.roles = (msg.member)? msg.member.roles:null;
+        this.roles = (msg.member)? msg.member.roles:[];
         this.channel = msg.channel;
         this.ch_type = msg.channel.type;
     }
@@ -36,118 +44,83 @@ module.exports = class MessageParser extends EventEmitter {
             cmd:this.cmd
         };
     }
-    set args(a)
+    set args(args)
     {
-        this.arg_list = {};
-        this.arg_list.cmd = [];
-        this.arg_list.args = [];
-
-        let toLC = (str) => str.toLowerCase();
-        let append = (arr, e) => this.arg_list[arr].push(e);
-        let substr = (c, s, e) => c.substring(s, e? e:c.length);
-
-        let cmd = toLC(a.split(' ')[0]);
-
-        for(let c of Commands.list())
+        let i = args.indexOf(' ')+1;
+        if(i > 0)
         {
-            if(cmd.includes(c))
-            {
-                append('cmd', substr(cmd, 1, c.length));
-                if(cmd.length > c.length)
-                {
-                    append('cmd', substr(cmd, c.length));
-                }
-                break;
-            }
-        }
-        if(a.trim().includes(' '))
-        {
-            this.arg_list.args = toLC(substr(a,a.indexOf(' ')+1)).split(',');
-            for(let a in this.arg_list.args)
-            {
-                this.arg_list.args[a] = this.arg_list.args[a].trim();
-            }
-        }
-        else
-        {
-            logger.info('No arguments')
+            this.arg_list.args = args.substring(i).split(',').map(s=>s.trim());
         }
     }
     get args()
     {
         return this.arg_list.args;
     }
+    set cmd(cmd)
+    {
+        this.arg_list.cmd = Commands.list().find(c => cmd.startsWith(c));
+        this.opt =  this.arg_list.cmd?
+                    cmd.length != this.arg_list.cmd.length?
+                    cmd.substring(this.arg_list.cmd.length) : '' : '';
+    }
     get cmd()
     {
-        return this.arg_list.cmd[0];
+        return this.arg_list.cmd;
+    }
+    set opt(opt_str)
+    {
+        this.arg_list.opt = opt_str;
     }
     get opt()
     {
-        return this.arg_list.cmd[1];
+        return this.arg_list.opt;
     }
     isCommand(char)
     {
         return char==='!';
     }
-    set(msg)
+    command()
     {
-        this.data = msg;
-        this.args = msg.content;
-        this.fetchCommand(this.cmd, this.opt, this.args);
-    }
-    fetchCommand(cmd, opt, args)
-    {
-        switch(cmd)
+        switch(this.cmd)
         {
             case "help":
-            // Fetch.help(this, args[0]);
-            this.execCmd(new CmdHelp(arg));
-            break;
-            case "find":Fetch.find(this, opt, args); break;
-            case "delete":Fetch.delete(this, opt, args); break;
+            return new CmdHelp(this.args[0]);
+            case "find":
+            return new CmdFind(this.args);
+            case "delete":
+            return new CmdDelete(this.username, this.args[0], this.args[1]);
             case "add":
-            this.exeCmd(new CmdAdd(args, this.username));
-            break;
-            case "get":Fetch.get(this,opt,args[0]); break;
+            return new CmdAdd(this.args, this.username);
+            case "get":
+            return new CmdGet(this.args[0]);
         }
+        return null;
     }
-    exeCmd(cmd)
+    execute(cmd)
     {
-        let data = {data:this.data};
-        if(this.checkChannel(cmd.get()))
+        if(cmd)
         {
-            if(this.hasPermission(cmd.get()))
+            let data = {data:this.data,ch:'ch'};
+            if(cmd.channels.includes(this.ch_type))
             {
-                let output = cmd.execute(this.opt);
-                data.ch = output.ch;
-                data.out = output.msg;
-                this.emit('cmd', data);
-            }
-        }
-    }
-    //Returns specified role of member if member contains it
-    checkRole(role)
-    {
-        return this.roles.find(r => r.name === role);
-    }
-    //Returns whether command is being used in proper channel type
-    checkChannel(cmd)
-    {
-        return cmd.channels.includes(this.ch_type);
-    }
-    hasPermission(cmd)
-    {
-        if(cmd.roles.length > 0)
-        {
-            for(let r of cmd.roles)
-            {
-                if(this.checkRole(r))
+                if(this.ch_type == 'dm'
+                || this.roles.some(r => cmd.roles.includes(r.name)))
                 {
-                    return true;
+                    let output = cmd.execute(this.opt);
+                    data.ch = output.ch;
+                    data.out = output.msg;
+                }
+                else
+                {
+                    logger.info(`Access denied`);
+                    data.out = cmd.message('nopermit');
                 }
             }
-            return false;
+            else
+            {
+                data.out = cmd.message('nopermit');
+            }
+            this.emit('cmd', data);
         }
-        return true;
     }
 }

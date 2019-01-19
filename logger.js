@@ -23,25 +23,35 @@ class Logger
                 )
         }
     }
+    getOutput(msg)
+    {
+        return `${timestamp()}\nMessage: ${msg}`;
+    }
+    logToConsole(msg)
+    {
+        this.loggers.console.log(this.getOutput(msg));
+    }
+    logToFile(msg)
+    {
+        this.loggers.logfile.log(this.getOutput(msg));
+    }
+    errToConsole(msg)
+    {
+        this.loggers.console.error(this.getOutput(msg));
+    }
+    errToFile(msg)
+    {
+        this.loggers.logfile.error(this.getOutput(msg));
+    }
     info(msg)
     {
-        var out = {timestamp:timestamp(),message:msg};
-        this.log(out);
+        this.loggers.console.log(this.getOutput(msg));
+        this.loggers.logfile.log(this.getOutput(msg));
     }
     error(msg)
     {
-        var out = {timestamp:timestamp(),message:msg};
-        this.err(out);
-    }
-    log(msg)
-    {
-        this.loggers.console.log(msg);
-        this.loggers.logfile.log(msg);
-    }
-    err(msg)
-    {
-        this.loggers.console.error(msg);
-        this.loggers.logfile.error(msg);
+        this.loggers.console.error(this.getOutput(msg));
+        this.loggers.logfile.error(this.getOutput(msg));
     }
 }
 
@@ -55,7 +65,7 @@ var timestamp = () =>
     let year = now.getFullYear();
     let month = now.getMonth() + 1;
     let day = now.getDate();
-    return `${year}-${month}-${day}::${hours}:${mins}:${secs}`;
+    return `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
 }
 
 const logger = new Logger({logfile:'./Logs/inept.log',errfile:'./Logs/crash.log'});

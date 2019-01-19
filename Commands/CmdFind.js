@@ -1,58 +1,59 @@
 const logger = require('../Logger.js');
+const Command = require('./Commands.js');
 var linksDB = require('../Database/Database.js');
 
-module.exports = class Find
+module.exports = class CmdFind extends Command
 {
-    static links(keywds)
+    constructor(args)
+    {
+        super('find');
+        this.keywords = args;
+        this.ch = 'dm';
+    }
+    execute(opt)
+    {
+        switch(opt)
+        {
+            case 'tags': case 'tag': case 't':
+            return this.exit(this.tags());
+            case 'links': case 'link': case 'l': default:
+            return this.exit(this.links());
+        }
+    }
+    exit(msg)
+    {
+        return {ch:this.ch,msg:msg};
+    }
+    links()
     {
         let out = [];
         let tmp_db = {};
-        linksDB.forall(k =>
+
+        linksDB.foreach((key, entry) =>
         {
-            linksDB.getEntry(k).tags.forEach(t =>
+            if(entry.tags.some(tag => this.keywords.some(w =>
+                tag.includes(w) || key.includes(w))))
             {
-                keywds.forEach(w =>
-                {
-                    if(t.includes(w) || k.includes(w))
-                    {
-                        tmp_db[k] = linksDB.getEntry(k);
-                    }
-                });
-            });
+                out.push(`[${key}](<${entry.data}>)`
+                    + `\nPosted by ${entry.op}`
+                    + `\ntags: ${entry.tags}`)
+            }
         });
-        for(let k in tmp_db)
-        {
-            out.push(`[${k}](<${tmp_db[k].data}>)`
-                + `\nPosted by ${tmp_db[k].op}`
-                + `\ntags: ${tmp_db[k].tags}`);
-        }
         out.sort();
-        return out;
+        return out.length? out : this.message('notfound');
     }
-    static tags(keywds)
+    tags()
     {
         let out = [];
-        linksDB.foreach(link =>
+
+        linksDB.foreach((k, link) =>  link.tags.forEach(t =>
         {
-            link.tags.forEach(t =>
+            if(this.keywords.some(w => t.includes(w) && !out.includes(t)))
             {
-                if(keywds.length == 0 && !out.includes(t))
-                {
-                    out.push(t);
-                }
-                else
-                {
-                    keywds.forEach(w =>
-                    {
-                        if(t.includes(w) && !out.includes(t))
-                        {
-                            out.push(t);
-                        }
-                    });
-                }
-            });
-        });
+                out.push(t)
+            }
+        }));
         out.sort();
-        return out.join(', ');
+        return out.length? out.join(', ') : this.message('notfound');
     }
 }

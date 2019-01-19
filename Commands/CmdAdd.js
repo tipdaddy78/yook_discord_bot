@@ -36,43 +36,32 @@ module.exports = class CmdAdd extends Command
     }
     addTags(link, tags, usr)
     {
-        if(linksDB.exists(link))
+        let addTags = (entry) =>
         {
-            let entry = linksDB.getEntry(link);
-            if(entry.op==usr)
-            {
-                let new_tags = entry.tags;
-                for(let t of tags)
-                {
-                    if(!new_tags.includes(t))
-                    {
-                        new_tags.push(t);
-                    }
-                }
-                linksDB.add(link, this.toJSO(entry.data, new_tags, usr));
-                return this.exit('overwrite');
-            }
-            return this.exit('noedit');
+            entry.tags = entry.tags.concat(tags.filter(t => !entry.tags.includes(t)));
+            linksDB.add(link, entry);
+            return this.exit('overwrite');
         }
-        return this.exit('notfound');
+        return  linksDB.exists(link)?
+                linksDB.getEntry(link).op==usr?
+                addTags(linksDB.getEntry(link))
+                : this.exit('noedit')
+                : this.exit('notfound');
     }
     addLink(link, name, tags, op)
     {
-        if(link.startsWith('http://')
-            || link.startsWith('https://'))
-        {
-            if(linksDB.exists(name))
-            {
-                if(linksDB.getEntry(name).op==op)
-                {
-                    linksDB.add(name, this.toJSO(link,tags,op));
-                    return this.exit('added');
-                }
-                return this.exit('noedit');
-            }
-            linksDB.add(name, this.toJSO(link,tags,op));
-            return this.exit('added');
-        }
-        return this.exit('badlink');
+        let add = () => this.add(name, this.toJSO(link, tags, op));
+        return  link.search(/\bhttps?:\/\//) != -1?
+                linksDB.exists(name)?
+                linksDB.getEntry(name).op==op?
+                add()
+                : this.exit('noedit')
+                : add()
+                : this.exit('badlink');
+    }
+    add(key, value)
+    {
+        linksDB.add(key, value);
+        return this.exit('added');
     }
 }

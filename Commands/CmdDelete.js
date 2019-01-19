@@ -1,73 +1,55 @@
 const Command = require('./Commands.js');
 const logger = require('../Logger.js');
 var linksDB = require('../Database/Database.js');
-const msg = ['deleted','wrongop','notfound','noinput'];
 
 module.exports = class Delete extends Command
 {
     constructor(usr, link, tag)
     {
-
+        super('delete');
+        this.usr = usr;
+        this.link = link;
+        this.tag = tag?tag:null;
+        this.ch = 'ch';
+        logger.info(`User: ${usr} Link: ${link} Tag: ${tag}`);
     }
-    static link(usr, link)
+    execute(opt)
     {
-        if(link)
+        switch(opt)
         {
-            if(linksDB.exists(link))
-            {
-                if(linksDB.getEntry(link).op==usr)
-                {
-                    linksDB.delete(link)
-                    return msg[0];
-                }
-                else
-                {
-                    return msg[1];
-                }
-            }
-            else
-            {
-                return msg[2];
-            }
-        }
-        else
-        {
-            return msg[3];
+            case 'tag': case 't':
+            return  (this.link && this.tag)?
+                    linksDB.exists(this.link)?
+                    linksDB.getEntry(this.link).op==this.usr?
+                    linksDB.getEntry(this.link).tags.includes(this.tag)?
+                    this.deleteTag(this.link,linksDB.getEntry(this.link))
+                    : this.exit('notfound')
+                    : this.exit('wrongop')
+                    : this.exit('notfound')
+                    : this.exit('noinput');
+            case 'link': case 'l': default:
+            return  this.link?
+                    linksDB.exists(this.link)?
+                    linksDB.getEntry(this.link).op==this.usr?
+                    this.deleteLink(this.link)
+                    : this.exit('wrongop')
+                    : this.exit('notfound')
+                    : this.exit('noinput');
         }
     }
-    static tag(usr, link, tag)
+    exit(msg)
     {
-        if(link && tag)
-        {
-            if(linksDB.exists(link))
-            {
-                let tmp_entry = linksDB.getEntry(link);
-                if(tmp_entry.op==usr)
-                {
-                    if(tmp_entry.tags.includes(tag))
-                    {
-                        tmp_entry.tags.splice(tmp_entry.tags.indexOf(tag),1);
-                        db.add(link,tmp_entry);
-                        return msg[0];
-                    }
-                    else
-                    {
-                        return msg[2];
-                    }
-                }
-                else
-                {
-                    return msg[1];
-                }
-            }
-            else
-            {
-                return msg[2]
-            }
-        }
-        else
-        {
-            return msg[3];
-        }
+        return {ch:this.ch,msg:this.message(msg)}
+    }
+    deleteLink(link)
+    {
+        linksDB.delete(link);
+        return this.exit('deleted');
+    }
+    deleteTag(link,entry)
+    {
+        entry.tags.splice(entry.tags.indexOf(this.tag),1);
+        linksDB.add(link,entry);
+        return this.exit('deleted');
     }
 }
