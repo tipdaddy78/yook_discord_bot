@@ -25,7 +25,6 @@ module.exports = class MessageParser extends EventEmitter {
     }
     set data(msg)
     {
-        this.msg = msg;
         this.server = msg.guild;
         this.usr = msg.author;
         this.username = msg.author.username;
@@ -36,7 +35,6 @@ module.exports = class MessageParser extends EventEmitter {
     get data()
     {
         return {
-            msg:this.msg,
             usr:this.usr,
             username:this.username,
             roles:this.roles,

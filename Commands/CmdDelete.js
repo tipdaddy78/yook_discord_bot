@@ -10,7 +10,7 @@ module.exports = class Delete extends Command
         this.usr = usr;
         this.link = args[0];
         this.tags = args.slice(1);
-        this.ch = 'ch';
+        this.ch = 're';
     }
     execute(opt, isOwner)
     {

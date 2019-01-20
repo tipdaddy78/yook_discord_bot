@@ -100,5 +100,22 @@
             "noinput":"Please enter the name of what you want to delete.",
             "noedit":"Link must have at least one tag for searching."
         }
+    },
+    "quote":{
+        "roles":["Mods","Dev","Testers","Runners","Community-Dev"],
+        "channels":["text"],
+        "help":[
+            "```!quote username, quote name```",
+            "`!quote` will save the last message from the specified user."
+            "-Usernames are case sensitive, and must be an exact match.",
+            "-Quote names may contain spaces and are NOT case sensitive",
+            "**Options**",
+            "`!quoteme` will save your own last message."
+        ],
+        "message":{
+            "notfound":"Cannot find quote, to search for quotes, use !findquote.",
+            "nopermit":"This command can only be used in permitted channels by members with permitted roles.",
+            "noinput":"Please enter the name of the user, if you're quoting yourself, use `!quoteme` instead."
+        }
     }
 }

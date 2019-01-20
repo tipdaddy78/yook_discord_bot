@@ -42,6 +42,10 @@ bot.on('guildMemberAdd', member =>
         if (!channel) return;
         // Send the message, mentioning the member
         channel.send(`Welcome to the server, ${member}!`);
+                    // + `I am INEPT, my creator is ch1pset.` 
+                    // + `If you are interested in speedrunning YL, I have some useful commands you may use to find resources.`
+                    // + `Use !help for a list of commands and how to use them.`
+                    // + `To keep spam out of the channels, I will reply spammy searches in a DM`);
     }
 );
 
@@ -76,7 +80,7 @@ function sendToChannel(channel, data, output)
     switch(channel)
     {
         case 'ch': data.channel.send(output); break;
-        case 're': data.msg.reply(output); break;
+        case 're': data.channel.send(`${data.usr}\n` + output); break;
         case 'dm': data.usr.send(output); break;
     }
 }
