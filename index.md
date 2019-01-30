@@ -1,4 +1,4 @@
-##Yook Discord Bot
+Yook Discord Bot
 ===================
 **Dependencies**
 + [NodeJS](https://nodejs.org/en/)
@@ -22,6 +22,6 @@
 + Logs
     + Logger
 
-##Documentation
+Documentation
 ================
 **Coming Soon<sup>TM</sup>**
