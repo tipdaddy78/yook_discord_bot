@@ -1,8 +1,7 @@
-const logger = require('../logger.js');
-const Command = require('./Commands.js');
-var linksDB = require('../Database/Database.js');
+const H = require('./header.js');
+var linksDB = H.Database.links;
 
-module.exports = class CmdGet extends Command
+module.exports = class CmdGet extends H.Command
 {
     constructor(args)
     {

@@ -1,8 +1,7 @@
-const Command = require('./Commands.js');
-const logger = require('../Logger.js');
-var linksDB = require('../Database/Database.js');
+const H = require('./header.js');
+var linksDB = H.Database.links;
 
-module.exports = class Delete extends Command
+module.exports = class Delete extends H.Command
 {
     constructor(usr, args)
     {

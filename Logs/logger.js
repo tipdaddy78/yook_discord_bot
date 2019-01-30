@@ -25,7 +25,7 @@ class Logger
     }
     getOutput(msg)
     {
-        return `${timestamp()}\nMessage: ${msg}`;
+        return `${timestamp()} Message: ${msg}`;
     }
     logToConsole(msg)
     {

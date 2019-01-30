@@ -1,8 +1,7 @@
-const logger = require('../Logger.js');
-const Command = require('./Commands.js');
-var linksDB = require('../Database/Database.js');
+const H = require('./header.js');
+var linksDB = H.Database.links;
 
-module.exports = class CmdFind extends Command
+module.exports = class CmdFind extends H.Command
 {
     constructor(args)
     {
@@ -26,14 +25,16 @@ module.exports = class CmdFind extends Command
     }
     links()
     {
-        let out = linksDB.filter((key,entry) =>
+        let match = (w, key, tags) =>
         {
-            return entry.tags.some(tag => this.keywords.some(w =>
-            {
-                let regex = new RegExp(w,'i');
-                return tag.match(regex) || key.match(regex);
-            }));
-        });
+            let regex = new RegExp(w,'i');
+            return tags.some(t => t.match(regex)) || key.match(regex);
+        }
+
+        let check = (k,e) => this.keywords.some(w => match(w,k,e.tags));
+
+        let out = linksDB.filter((k,e) => check(k,e));
+
         out.sort((a,b) =>
         {
             let varA = a[0].toUpperCase();
@@ -42,26 +43,27 @@ module.exports = class CmdFind extends Command
             if(varA < varB) return 1;
             return 0;
         });
+
         out = out.map(entry =>
             (`[${entry[0]}](<${entry[1].data}>)`
             + `\nPosted by ${entry[1].op}`
             + `\ntags: ${entry[1].tags.join(', ')}\n`));
+
         return out.length? out : this.message('notfound');
     }
     tags()
     {
         let out = [];
 
-        linksDB.foreach((k,link) =>
+        let match = (t,w) => t.match(new RegExp(w,'i'));
+        let check = (k,t) => !k.length || k.some(w => match(t,w));
+
+        linksDB.foreach((key,link) =>
         {
-            let tags = link.tags.filter(t => !this.keywords.length
-            || this.keywords.some(w =>
-            {
-                let w_regex = new RegExp(w, 'i');
-                return t.match(w_regex);
-            }));
+            let tags = link.tags.filter(t => check(this.keywords, t));
             out = out.concat(tags.filter(t => !out.includes(t)));
         });
+
         out.sort((a,b) =>
         {
             let varA = a.toUpperCase();

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const logger = require('../Logger.js');
+const logger = require('../Logs/Logger.js');
 
 
 //Database class represents a JSON file which may be read from and written to
@@ -9,7 +9,6 @@ class Database
     {
         this.db = json;
         this.filepath = filepath;
-        this.array = json;
     }
     //This edits the JSON by adding a new key-value pair by appending, or
     //overwriting it in the file.
@@ -53,6 +52,9 @@ class Database
         }
         return [];
     }
+    //Returns an array of key-value pairs that satisfy the callback test
+    //function. It works the same way that Array.filter() works.
+    //
     filter(callback)
     {
         let out = [];
@@ -65,7 +67,11 @@ class Database
         }
         return out;
     }
-
+    //Writes the database to specified file passed into constructor
+    //
+    //The write completely replaces the file with new data as opposed to just
+    //editing certain section, this is a limitation of NodeJS
+    //
     updateDB()
     {
         fs.writeFile(this.filepath, JSON.stringify(this.db, null, 4), (err) =>
@@ -77,7 +83,11 @@ class Database
     }
 }
 
-const file = './Database/links.json';
-const db = require('./links.json');
-var linksDB = new Database(db, file);
-module.exports = linksDB;
+const links_db_filename = './Database/links.json';
+const links_db_file = require('./links.json');
+const quotes_db_filename = './Database/quotes.json';
+const quotes_db_file = require('./quotes.json');
+var links = new Database(links_db_file, links_db_filename);
+var quotes = new Database(quotes_db_file, quotes_db_filename);
+var DB = {links:links,quotes:quotes};
+module.exports = DB;

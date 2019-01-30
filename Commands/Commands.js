@@ -1,4 +1,3 @@
-const logger = require('../Logger.js');
 const cmdList = require('./commands.json');
 
 

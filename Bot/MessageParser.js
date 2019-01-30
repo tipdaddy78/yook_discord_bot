@@ -1,11 +1,6 @@
 const EventEmitter = require('events');
-const Commands = require('./Commands/Commands.js');
-const CmdAdd = require('./Commands/CmdAdd.js');
-const CmdHelp = require('./Commands/CmdHelp.js');
-const CmdDelete = require('./Commands/CmdDelete.js');
-const CmdFind = require('./Commands/CmdFind.js');
-const CmdGet = require('./Commands/CmdGet.js');
-const logger = require('./Logger.js');
+const H = require('./header.js');
+const logger = H.Logger;
 
 //Node.js export for use in other scripts
 //Cmd class contains functions that are crucial for bot commands
@@ -57,7 +52,7 @@ module.exports = class MessageParser extends EventEmitter {
     }
     set cmd(cmd)
     {
-        this.arg_list.cmd = Commands.list().find(c => cmd.startsWith(c));
+        this.arg_list.cmd = H.Commands.list().find(c => cmd.startsWith(c));
         this.opt =  this.arg_list.cmd?
                     cmd.length != this.arg_list.cmd.length?
                     cmd.substring(this.arg_list.cmd.length) : '' : '';
@@ -85,15 +80,15 @@ module.exports = class MessageParser extends EventEmitter {
         switch(this.cmd)
         {
             case "help":
-            return new CmdHelp(this.args);
+            return new H.CmdHelp(this.args);
             case "find":
-            return new CmdFind(this.args);
+            return new H.CmdFind(this.args);
             case "delete":
-            return new CmdDelete(this.username, this.args);
+            return new H.CmdDelete(this.username, this.args);
             case "add":
-            return new CmdAdd(this.username, this.args);
+            return new H.CmdAdd(this.username, this.args);
             case "get":
-            return new CmdGet(this.args);
+            return new H.CmdGet(this.args);
         }
         return null;
     }

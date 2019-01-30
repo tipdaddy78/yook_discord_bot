@@ -1,17 +1,17 @@
-const Command = require('./Commands.js');
+const H = require('./header.js');
 
-module.exports = class CmdHelp extends Command
+module.exports = class CmdHelp extends H.Command
 {
     constructor(args)
     {
         super('help');
-        this.cmd = args[0].toLowerCase();
+        this.cmd = args[0]?args[0].toLowerCase():this.str;
         this.ch = 'dm';
     }
     set cmd(cmd)
     {
         this.command = cmd?
-            new Command(cmd[0]==='!'?
+            new H.Command(cmd[0]==='!'?
             cmd.substring(1) : cmd)
             : this;
     }
@@ -21,13 +21,13 @@ module.exports = class CmdHelp extends Command
     }
     execute()
     {
-        if(Command.exists(this.cmd.str))
+        if(H.Command.exists(this.cmd.str))
         {
             let out =  ['**Usage:**'];
             this.cmd.help.forEach(h => out.push(h));
 
             let ch = this.cmd.channels.map(c => `\`${c}\``);
-            let clist = Command.list().map(cmd => `\`!${cmd}\``);
+            let clist = H.Command.list().map(cmd => `\`!${cmd}\``);
 
             out.push('This command works in:');
             out.push(`${ch.join(', ')} channels\n`);

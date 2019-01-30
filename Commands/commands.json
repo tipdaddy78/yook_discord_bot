@@ -45,12 +45,12 @@
             "`!addlink` or `!addl` will perform default operation.\n"
         ],
         "message":{
-            "added":"Link added!",
-            "overwrite":"Link has been edited!",
+            "added":"Entry added!",
+            "overwrite":"Entry has been edited!",
             "nopermit":"This command can only be used in permitted channels by members with permitted roles.",
             "badlink":"Only links beginning with http or https allowed!",
-            "noedit":"Only OP can overwrite, edit or delete their own links!",
-            "notfound":"No link by that name in database.",
+            "noedit":"Only OP can overwrite, edit or delete their own entries!",
+            "notfound":"No entry by that name in database.",
             "missingarg":[
                 "You must provide a link, name, and at least 1 tag.",
                 "Separate arguments by a comma: `https://link, my link name, first tag, ...`",
@@ -106,7 +106,7 @@
         "channels":["text"],
         "help":[
             "```!quote username, quote name```",
-            "`!quote` will save the last message from the specified user."
+            "`!quote` will save the last message from the specified user.",
             "-Usernames are case sensitive, and must be an exact match.",
             "-Quote names may contain spaces and are NOT case sensitive",
             "**Options**",

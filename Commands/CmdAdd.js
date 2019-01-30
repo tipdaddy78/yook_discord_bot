@@ -1,8 +1,7 @@
-const logger = require('../Logger.js');
-const Command = require('./Commands.js');
-var linksDB = require('../Database/Database.js');
+const H = require('./header.js');
+var linksDB = H.Database.links;
 
-module.exports = class CmdAdd extends Command
+module.exports = class CmdAdd extends H.Command
 {
     constructor(usr, args)
     {
@@ -43,14 +42,14 @@ module.exports = class CmdAdd extends Command
         let key = entry[0];
         entry = entry[1];
 
-        let new_tags = () =>
+        let check = (t) =>
         {
-            return tags.filter(t =>
-            {
-                let t_regex = new RegExp(t,'i');
-                return !entry.tags.some(e_t => e_t.match(t_regex));
-            })
+            let regex = new RegExp(t,'i');
+            return !entry.tags.some(e_t => e_t.match(regex));
         }
+
+        let new_tags = () => tags.filter(t => check(t));
+
         let new_entry = () =>
         {
             entry.tags = entry.tags.concat(new_tags());

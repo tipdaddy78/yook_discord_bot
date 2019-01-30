@@ -4,7 +4,7 @@
 
 const Discord = require('discord.js');
 const MessageParser = require('./MessageParser.js');
-const logger = require('./Logger.js');
+const logger = require('../Logs/Logger.js');
 const auth = require('./auth.json');
 
 // Initialize Discord Bot
@@ -42,7 +42,7 @@ bot.on('guildMemberAdd', member =>
         if (!channel) return;
         // Send the message, mentioning the member
         channel.send(`Welcome to the server, ${member}!`);
-                    // + `I am INEPT, my creator is ch1pset.` 
+                    // + `I am INEPT, my creator is ch1pset.`
                     // + `If you are interested in speedrunning YL, I have some useful commands you may use to find resources.`
                     // + `Use !help for a list of commands and how to use them.`
                     // + `To keep spam out of the channels, I will reply spammy searches in a DM`);
@@ -55,14 +55,6 @@ bot.on('guildMemberAdd', member =>
 input.on('cmd', (e) =>
     {
         logger.info(`${e.data.username} used !${e.data.cmd}`);
-        sendToChannel(e.ch, e.data, e.out);
-    }
-);
-
-//Event listener for any errors thrown by a command.
-input.on('err', (e) =>
-    {
-        logger.info(`${e.data.cmd} threw an error for ${e.data.username} :  ${e.err}`);
         sendToChannel(e.ch, e.data, e.out);
     }
 );
