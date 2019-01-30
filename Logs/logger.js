@@ -42,6 +42,7 @@ class Logger
     errToFile(msg)
     {
         this.loggers.logfile.error(this.getOutput(msg));
+        this.loggers.logfile.trace(msg);
     }
     info(msg)
     {

@@ -62,6 +62,7 @@ input.on('cmd', (e) =>
 process.on('uncaughtException', msg =>
     {
         logger.errToFile(msg);
+        
         logger.errToConsole('Bot crashed. Check crash.log');
     }
 );
