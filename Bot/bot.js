@@ -67,6 +67,20 @@ process.on('uncaughtException', msg =>
     }
 );
 
+process.stdin.on('readable', () =>
+{
+    let chunk;
+    while((chunk = process.stdin.read()) !== null)
+    {
+        let cmd_in = chunk.toString();
+        switch(cmd_in)
+        {
+            case 'mem': process.stdout.write(`${process.memoryUsage()}`) break;
+            case 'exit': case 'quit': process.exit(0);
+        }
+    }
+})
+
 //Utility function to select output channel for sending messages from the bot.
 function sendToChannel(channel, data, output)
 {
