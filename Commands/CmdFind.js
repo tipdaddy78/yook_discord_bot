@@ -28,7 +28,7 @@ module.exports = class CmdFind extends H.Command
         let match = (w, key, tags) =>
         {
             let regex = new RegExp(w,'i');
-            return tags.some(t => t.match(regex)) || key.match(regex);
+            return tags.some(t => regex.test(t)) || regex.test(key);
         }
 
         let check = (k,e) => this.keywords.some(w => match(w,k,e.tags));
@@ -55,7 +55,7 @@ module.exports = class CmdFind extends H.Command
     {
         let out = [];
 
-        let match = (t,w) => t.match(new RegExp(w,'i'));
+        let match = (t,w) => (new RegExp(w,'i')).test(t);
         let check = (k,t) => !k.length || k.some(w => match(t,w));
 
         linksDB.foreach((key,link) =>

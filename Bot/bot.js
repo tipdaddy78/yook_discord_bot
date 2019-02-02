@@ -4,7 +4,7 @@
 
 const Discord = require('discord.js');
 const MessageParser = require('./MessageParser.js');
-const logger = require('../Logs/Logger.js');
+const logger = require('../Logs/logger.js');
 const auth = require('./auth.json');
 
 // Initialize Discord Bot
@@ -62,7 +62,7 @@ input.on('cmd', (e) =>
 process.on('uncaughtException', msg =>
     {
         logger.errToFile(msg);
-        
+
         logger.errToConsole('Bot crashed. Check crash.log');
     }
 );

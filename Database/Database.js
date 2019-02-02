@@ -1,5 +1,5 @@
 const fs = require('fs');
-const logger = require('../Logs/Logger.js');
+const logger = require('../Logs/logger.js');
 
 
 //Database class represents a JSON file which may be read from and written to

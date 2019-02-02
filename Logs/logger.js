@@ -56,19 +56,43 @@ class Logger
     }
 }
 
-var timestamp = () =>
+var date = (now) =>
 {
-    let now = new Date(Date.now());
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    let day - now.getDate();
+    return `${year}-${month}-${day}`;
+}
+var time = (now) =>
+{
     let t_str = t => t.toString().padStart(2,'0');
     let hours = t_str(now.getHours());
     let mins = t_str(now.getMinutes());
     let secs = t_str(now.getSeconds());
-    let year = now.getFullYear();
-    let month = now.getMonth() + 1;
-    let day = now.getDate();
-    return `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
+    return `${hours}:${mins}:${secs}`;
+}
+var timestamp = () =>
+{
+    let now = new Date(Date.now());
+    return `${date(now)} ${time(now)}`;
 }
 
-const logger = new Logger({logfile:'./Logs/inept.log',errfile:'./Logs/crash.log'});
+function check(fname)
+{
+    var val = -1;
+    var date = `${date(new Date(Date.now()))}`;
+    var path;
+    do
+    {
+        val++;
+        path = `./Logs/${date}_${fname}${val!==0?`(${val})`:''}.log`;
+    }
+    while(fs.exists(path));
+    return path
+}
+
+
+
+const logger = new Logger({logfile:check('inept'),errfile:check('crash')});
 
 module.exports = logger;

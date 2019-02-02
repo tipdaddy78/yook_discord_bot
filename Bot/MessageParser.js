@@ -11,6 +11,9 @@ module.exports = class MessageParser extends EventEmitter {
     {
         super();
     }
+    //Master setter function
+    //
+    //sets all properties of MessageParser object
     set(msg)
     {
         this.data = msg;
@@ -18,6 +21,8 @@ module.exports = class MessageParser extends EventEmitter {
         this.cmd = msg.content.match(/^!([a-z]+\b)/i)[1];
         this.args = msg.content.trim();
     }
+    //collection of data from the DiscordJS Message object necessary for this
+    //bot's functions
     set data(msg)
     {
         this.server = msg.guild;
@@ -38,6 +43,7 @@ module.exports = class MessageParser extends EventEmitter {
             cmd:this.cmd
         };
     }
+    //Array of arguments from user message, delineated by commas
     set args(args)
     {
         let i = args.indexOf(' ')+1;
@@ -50,6 +56,8 @@ module.exports = class MessageParser extends EventEmitter {
     {
         return this.arg_list.args;
     }
+    //Takes the first word of the message and checks if it begins with a
+    //command name, anything after that is added as an option
     set cmd(cmd)
     {
         this.arg_list.cmd = H.Commands.list().find(c => cmd.startsWith(c));
@@ -61,6 +69,7 @@ module.exports = class MessageParser extends EventEmitter {
     {
         return this.arg_list.cmd;
     }
+    //The substring of a command that comes after the name of the command
     set opt(opt_str)
     {
         this.arg_list.opt = opt_str;
