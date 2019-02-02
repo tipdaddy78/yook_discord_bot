@@ -56,14 +56,14 @@ class Logger
     }
 }
 
-var date = (now) =>
+function cur_date(now)
 {
     let year = now.getFullYear();
     let month = now.getMonth() + 1;
-    let day - now.getDate();
+    let day = now.getDate();
     return `${year}-${month}-${day}`;
 }
-var time = (now) =>
+function cur_time(now)
 {
     let t_str = t => t.toString().padStart(2,'0');
     let hours = t_str(now.getHours());
@@ -74,20 +74,20 @@ var time = (now) =>
 var timestamp = () =>
 {
     let now = new Date(Date.now());
-    return `${date(now)} ${time(now)}`;
+    return `${cur_date(now)} ${cur_time(now)}`;
 }
 
 function check(fname)
 {
     var val = -1;
-    var date = `${date(new Date(Date.now()))}`;
+    var date = `${cur_date(new Date(Date.now()))}`;
     var path;
     do
     {
         val++;
         path = `./Logs/${date}_${fname}${val!==0?`(${val})`:''}.log`;
     }
-    while(fs.exists(path));
+    while(fs.existsSync(path));
     return path
 }
 
