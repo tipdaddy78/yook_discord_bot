@@ -75,7 +75,9 @@ process.stdin.on('readable', () =>
         let cmd_in = /[\w]*\b/i.exec(chunk.toString());
         switch(cmd_in? cmd_in[0]:null)
         {
-            case 'mem': process.stdout.write(`${JSON.stringify(process.memoryUsage(),null,2)}`); break;
+            case 'mem':
+            process.stdout.write(`${JSON.stringify(process.memoryUsage(), null, 2)}`);
+            break;
             case 'exit': case 'quit': process.exit(0);
         }
     }
