@@ -31,6 +31,10 @@ module.exports = class MessageParser extends EventEmitter {
         this.roles = (msg.member)? msg.member.roles:[];
         this.channel = msg.channel;
         this.ch_type = msg.channel.type;
+        this.isServerOwner =
+            this.ch_type!='dm'?
+            this.server.owner.id === this.usr.id
+            : false;
     }
     get data()
     {
@@ -40,7 +44,8 @@ module.exports = class MessageParser extends EventEmitter {
             roles:this.roles,
             channel:this.channel,
             ch_type:this.ch_type,
-            cmd:this.cmd
+            cmd:this.cmd,
+            owner:this.isServerOwner
         };
     }
     //Array of arguments from user message, delineated by commas
@@ -86,6 +91,8 @@ module.exports = class MessageParser extends EventEmitter {
     {
         if(this.server)
             logger.info(`Command sent in ${this.server.name} server`);
+        else
+            logger.info(`Command sent from ${this.usr.username}'s dm'`);
         switch(this.cmd)
         {
             case "help":
@@ -98,37 +105,35 @@ module.exports = class MessageParser extends EventEmitter {
             return new H.CmdAdd(this.username, this.args);
             case "get":
             return new H.CmdGet(this.args);
+            case "wr":
+            return new H.CmdWR(this.args);
         }
         return null;
+    }
+    auth(cmd)
+    {
+        if(cmd.channels.includes(this.ch_type))
+        {
+            if(this.ch_type==='dm' || this.isServerOwner
+            || this.roles.some(r => cmd.roles.includes(r.name)))
+            {
+                return true;
+            }
+        }
+        return false;
     }
     execute(cmd)
     {
         if(cmd)
         {
             let data = {data:this.data,ch:'ch'};
-            let isOwner = this.ch_type!='dm'?
-                this.server.owner.id === this.usr.id
-                : false;
-            logger.info(`User is owner: ${isOwner}`);
-            if(cmd.channels.includes(this.ch_type))
+            if(this.auth(cmd))
             {
-                if(this.ch_type == 'dm' || isOwner
-                || this.roles.some(r => cmd.roles.includes(r.name)))
-                {
-                    let output = cmd.execute(this.opt, isOwner);
-                    data.ch = output.ch;
-                    data.out = output.msg;
-                }
-                else
-                {
-                    logger.info(`Access denied`);
-                    data.out = cmd.message('nopermit');
-                }
+                let output = cmd.execute(this.opt, this.isServerOwner);
+                data.ch = output.ch;
+                data.out = output.msg;
             }
-            else
-            {
-                data.out = cmd.message('nopermit');
-            }
+            else data.out = cmd.message('nopermit');
             this.emit('cmd', data);
         }
     }
