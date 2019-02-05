@@ -10,33 +10,51 @@ const {Console} = require('console');
 console.log(`Fetching All Bosses`);
 
 
-var retrieveData = new event();
-
-
-function getWR(cat)
+class WRretriever extends event
 {
-    let parsedData = null;
-    https.get(`${SRC}/leaderboards/${YL.id}/category/${YL.cat[cat]}`, (res) =>
+    constructor()
     {
-        let rawData = '';
-        res.setEncoding('utf8');
-        res.on('data', (chunk) => { rawData += chunk; });
-        res.on('end', () =>
+        super();
+        this.parsedData = null;
+    }
+    get()
+    {
+        let ret = this.parsedData;
+        this.parsedData = null;
+        return ret;
+    }
+    fetch(cat)
+    {
+        return (new Promise((resolve,reject) =>
         {
-            try
+            https.get(`${SRC}/leaderboards/${YL.id}/category/${YL.cat[cat]}`, (response) =>
             {
-                console.log('parsing data...')
-                parsedData = JSON.parse(rawData).data.runs[0].run.weblink;
-                retrieveData.emit('data', parsedData);
-            }
-            catch(e)
-            {
-                console.log(e);
-            }
+                let rawData = '';
+                response.setEncoding('utf8');
+                response.on('data', (chunk) => { rawData += chunk; });
+                response.on('end', () =>
+                {
+                    try
+                    {
+                        console.log('parsing data...')
+                        resolve(JSON.parse(rawData).data.runs[0].run.weblink);
+                    }
+                    catch(e)
+                    {
+                        reject(e);
+                    }
+                });
+            });
+        }))
+        .then(data =>
+        {
+            this.parsedData = data;
+        })
+        .catch(error =>
+        {
+            console.log(error);
         });
-    });
-    // while(!req.finished);
-    // return parsedData.data.runs[0];
+    }
 }
 
 function input(chunk)
@@ -51,13 +69,15 @@ function input(chunk)
     return output;
 }
 
-retrieveData.on('data', (wr) => {
+let WR = new WRretriever();
+
+WR.on('data', (wr) => {
     console.log(wr);
 });
 
 function readConsole()
 {
-    stdio.cin.on('readable', () =>
+    stdio.cin.on('readable', async function()
     {
         let chunk;
         while((chunk = stdio.cin.read()) !== null)
@@ -67,7 +87,8 @@ function readConsole()
             {
                 case 'quit': process.exit(); break;
                 default:
-                getWR(args[0]);
+                await WR.fetch(args[0]);
+                console.log(WR.get());
                 break;
             }
         }
