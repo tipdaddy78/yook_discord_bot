@@ -1,7 +1,8 @@
+const event = require('events');
 const cmdList = require('./commands.json');
 
 
-module.exports = class Command
+module.exports = class Command extends event
 {
     constructor(cmd_str)
     {
