@@ -8,6 +8,7 @@ const H =
     CmdFind:require('../Commands/CmdFind.js'),
     CmdGet:require('../Commands/CmdGet.js'),
     CmdQuote:require('../Commands/CmdQuote.js'),
+    CmdWR:require('../Commands/CmdWR.js'),
     Logger:require('../Logs/logger.js'),
     Database:require('../Database/Database.js')
 }
