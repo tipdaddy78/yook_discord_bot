@@ -55,7 +55,14 @@ bot.on('guildMemberAdd', member =>
 input.on('cmd', (e) =>
     {
         logger.info(`${e.data.username} used !${e.data.cmd}`);
-        sendToChannel(e.ch, e.data, e.out);
+        try
+        {
+            sendToChannel(e.ch, e.data, e.out);
+        }
+        catch(e)
+        {
+            logger.error(e);
+        }
     }
 );
 
