@@ -128,7 +128,7 @@
         ],
         "message":{
             "nopermit":"Something went wrong. Maybe wrong channel?",
-            "notfound":"That category doesn't exist."
+            "notfound":"That category doesn't exist. Use `!help wr` for valid categories."
         }
     }
 }
