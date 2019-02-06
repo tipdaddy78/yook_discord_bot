@@ -1,59 +1,44 @@
 
-const event = require('events');
 const https = require('https');
 const stdio = {cin:process.stdin,cout:process.stdout};
 
 var YL = require('../Database/YLSRC.json');
-var SRC = 'https://www.speedrun.com/api/v1';
+var URL = 'https://www.speedrun.com/api/v1/leaderboards/m1zz5210/category';
 const {Console} = require('console');
 
-console.log(`Fetching All Bosses`);
+console.log('Enter category:');
 
-
-class WRretriever extends event
+class WRretriever
 {
-    constructor()
-    {
-        super();
-        this.parsedData = null;
+    constructor(){
+        this.weblink = null;
     }
-    get()
+    try_catch(resolve, reject, raw)
     {
-        let ret = this.parsedData;
-        this.parsedData = null;
-        return ret;
+        try
+        {
+            resolve(JSON.parse(raw).data.runs[0].run.weblink);
+        }
+        catch(e)
+        {
+            reject('Not found');
+        }
     }
-    fetch(cat)
+    parseData(response, resolve, reject)
+    {
+        let rawData = '';
+        response.setEncoding('utf8');
+        response.on('data', (chunk) => { rawData += chunk; });
+        response.on('end', () => this.try_catch(resolve, reject, rawData));
+    }
+    get(cat)
     {
         return (new Promise((resolve,reject) =>
         {
-            https.get(`${SRC}/leaderboards/${YL.id}/category/${YL.cat[cat]}`, (response) =>
-            {
-                let rawData = '';
-                response.setEncoding('utf8');
-                response.on('data', (chunk) => { rawData += chunk; });
-                response.on('end', () =>
-                {
-                    try
-                    {
-                        console.log('parsing data...')
-                        resolve(JSON.parse(rawData).data.runs[0].run.weblink);
-                    }
-                    catch(e)
-                    {
-                        reject(e);
-                    }
-                });
-            });
+            https.get(`${URL}/${YL[cat]}`, res => this.parseData(res, resolve, reject));
         }))
-        .then(data =>
-        {
-            this.parsedData = data;
-        })
-        .catch(error =>
-        {
-            console.log(error);
-        });
+        .then(data => this.weblink = data)
+        .catch(msg => this.weblink = msg);
     }
 }
 
@@ -71,10 +56,6 @@ function input(chunk)
 
 let WR = new WRretriever();
 
-WR.on('data', (wr) => {
-    console.log(wr);
-});
-
 function readConsole()
 {
     stdio.cin.on('readable', async function()
@@ -85,10 +66,13 @@ function readConsole()
             let args = input(chunk);
             switch(args[0])
             {
-                case 'quit': process.exit(); break;
+                case 'quit':
+                    process.exit();
+                break;
                 default:
-                await WR.fetch(args[0]);
-                console.log(WR.get());
+                    let msg;
+                    await WR.get(args[0]);
+                    console.log(WR.weblink);
                 break;
             }
         }
