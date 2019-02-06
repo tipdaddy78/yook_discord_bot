@@ -1,7 +1,37 @@
 {
-    "any":"wkpq1w8d",
-    "anywf":"7kjzy44d",
-    "ab":"wdm466xd",
-    "100p":"wk618vrd",
-    "100":"7dg5nvl2"
+    "wkpq1w8d":[
+        "any",
+        "any%"
+    ],
+    "7kjzy44d":[
+        "awf",
+        "anywf",
+        "any wf",
+        "any w/f",
+        "any w/ f",
+        "any%wf",
+        "any% wf",
+        "any% w/f",
+        "any% w/ f",
+        "any% with flight",
+        "any% w/ flight",
+        "any% w/flight",
+        "with flight",
+        "w/ flight",
+        "w/flight",
+        "w/f"
+    ],
+    "wdm466xd":[
+        "ab",
+        "all bosses"
+    ],
+    "wk618vrd":[
+        "100p",
+        "100pagies",
+        "100 pagies"
+    ],
+    "7dg5nvl2":[
+        "100",
+        "100%"
+    ]
 }
