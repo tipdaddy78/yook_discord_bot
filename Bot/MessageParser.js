@@ -93,6 +93,7 @@ module.exports = class MessageParser extends EventEmitter {
             logger.info(`Command sent in ${this.server.name} server`);
         else
             logger.info(`Command sent from ${this.usr.username}'s dm'`);
+        logger.info(`Args: ${this.args}`);
         switch(this.cmd)
         {
             case "help":
@@ -129,12 +130,19 @@ module.exports = class MessageParser extends EventEmitter {
             let data = {data:this.data,ch:'ch'};
             if(this.auth(cmd))
             {
-                let output = cmd.execute(this.opt, this.isServerOwner);
-                data.ch = output.ch;
-                data.out = output.msg;
+                let output;
+                cmd.execute(this.opt, this.isServerOwner, (out) =>
+                {
+                    data.ch = out.ch;
+                    data.out = out.msg;
+                    this.emit('cmd', data);
+                });
             }
-            else data.out = cmd.message('nopermit');
-            this.emit('cmd', data);
+            else
+            {
+                data.out = cmd.message('nopermit');
+                this.emit('cmd', data);
+            }
         }
     }
 }
