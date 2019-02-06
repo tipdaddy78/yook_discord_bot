@@ -39,12 +39,12 @@ module.exports = class CmdHelp extends H.Command
             }
             out.push('List of commands:');
             out.push(`${clist.join(', ')}`);
-            return this.exit(out);
+            arguments[2](this.exit(out));
         }
         else
         {
             this.cmd = 'help';
-            return this.execute();
+            this.execute(arguments[0],arguments[1],arguments[2]);
         }
     }
     exit(msg)

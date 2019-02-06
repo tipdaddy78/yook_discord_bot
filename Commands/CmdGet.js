@@ -17,7 +17,8 @@ module.exports = class CmdGet extends H.Command
         switch(opt)
         {
             case 'link': case 'l': default:
-            return  this.exit(this.output(key, entry));
+            arguments[2](this.exit(this.output(key, entry)));
+            break;
         }
     }
     exit(msg)

@@ -14,9 +14,11 @@ module.exports = class CmdFind extends H.Command
         switch(opt)
         {
             case 'tags': case 'tag': case 't':
-            return this.exit(this.tags());
+            arguments[2](this.exit(this.tags()));
+            break;
             case 'links': case 'link': case 'l': default:
-            return this.exit(this.links());
+            arguments[2](this.exit(this.links()));
+            break;
         }
     }
     exit(msg)

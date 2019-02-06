@@ -14,7 +14,7 @@ module.exports = class CmdAdd extends H.Command
     {
         return {ch:this.ch,msg:this.message(exit_msg)};
     }
-    execute(opt, isOwner)
+    execute(opt, isOwner, callback)
     {
         let link, name, tags;
         switch(opt)
@@ -22,17 +22,18 @@ module.exports = class CmdAdd extends H.Command
             case 'tags': case 'tag': case 't':
             link = this.args[0];
             tags = this.args.slice(1);
-            return  link && tags.length?
+            callback(link && tags.length?
                     this.addTags(link, tags, this.usr, isOwner)
-                    : this.exit('missingarg');
-
+                    : this.exit('missingarg'));
+            break;
             case 'link': case 'l': default:
             link = this.args[0];
             name = this.args[1];
             tags = this.args.slice(2);
-            return  link && name && tags.length?
+            callback(link && name && tags.length?
                     this.addLink(link, name, tags, this.usr, isOwner)
-                    : this.exit('missingarg');
+                    : this.exit('missingarg'));
+            break;
         }
     }
     addTags(link, tags, usr, isOwner)

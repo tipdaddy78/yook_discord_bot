@@ -11,7 +11,7 @@ module.exports = class Delete extends H.Command
         this.tags = args.slice(1);
         this.ch = 're';
     }
-    execute(opt, isOwner)
+    execute(opt, isOwner, callback)
     {
         let l_regex = new RegExp(this.link, 'i');
         let entry = linksDB.find(k => k.match(l_regex));
@@ -22,7 +22,7 @@ module.exports = class Delete extends H.Command
             case 'tags': case 'tag': case 't':
             let t_regex = this.tags.map(t => new RegExp(t,'i'));
             let tags = entry.tags.filter(t => t_regex.some(r => t.match(r)));
-            return  (this.link && this.tags.length)?
+            callback((this.link && this.tags.length)?
                     key?
                     entry.op==this.usr || isOwner?
                     tags.length?
@@ -30,15 +30,17 @@ module.exports = class Delete extends H.Command
                     : this.exit('notfound')
                     : this.exit('wrongop')
                     : this.exit('notfound')
-                    : this.exit('noinput');
+                    : this.exit('noinput'));
+            break;
             case 'link': case 'l': default:
-            return  this.link?
+            callback(this.link?
                     key?
                     entry.op==this.usr || isOwner?
                     this.deleteLink(key)
                     : this.exit('wrongop')
                     : this.exit('notfound')
-                    : this.exit('noinput');
+                    : this.exit('noinput'));
+            break;
         }
     }
     exit(msg)
