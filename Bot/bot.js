@@ -16,40 +16,39 @@ function addBotListeners(bot)
 {
     //Event listener for when bot successfully logs on
     bot.on('ready', (evt) =>
-        {
-            logger.info(`Connected: Logged in as: ${bot.user.username}  id: ${bot.user.id}`);
-        }
-    );
+    {
+        logger.info(`Connected`);
+        logger.info(`Logged in as: ${bot.user.username}`);
+        logger.info(`id: ${bot.user.id}`);
+    });
 
     //Event listener for anytime a message is posted in a channel that our bot
     //has access to. Don't worry, I'm not logging everyone's messages to the bot.
     bot.on('message', msg =>
+    {
+        if(input.isCommand(msg.content[0]))
         {
-            if(input.isCommand(msg.content[0]))
-            {
-                input.set(msg);
-                let cmd = input.command();
-                input.execute(cmd);
-            }
+            input.set(msg);
+            let cmd = input.command();
+            input.execute(cmd);
         }
-    );
+    });
 
     // Create an event listener for new guild members
     bot.on('guildMemberAdd', member =>
-        {
-            logger.info(`${member.displayName} has joined the ${member.guild.name} server!`)
-            // Send the message to a designated channel on a server:
-            const channel = member.guild.channels.find(ch => ch.name === 'newcomers' || ch.name === 'testing');
-            // Do nothing if the channel wasn't found on this server
-            if (!channel) return;
-            // Send the message, mentioning the member
-            channel.send(`Welcome to the server, ${member}!`);
-                        // + `I am INEPT, my creator is ch1pset.`
-                        // + `If you are interested in speedrunning YL, I have some useful commands you may use to find resources.`
-                        // + `Use !help for a list of commands and how to use them.`
-                        // + `To keep spam out of the channels, I will reply spammy searches in a DM`);
-        }
-    );
+    {
+        logger.info(`${member.displayName} has joined the ${member.guild.name} server!`)
+        // Send the message to a designated channel on a server:
+        const channel = member.guild.channels.find(ch => ch.name === 'newcomers' || ch.name === 'testing');
+        // Do nothing if the channel wasn't found on this server
+        if (!channel) return;
+        // Send the message, mentioning the member
+        channel.send(`Welcome to the server, ${member}!`);
+                    // + `I am INEPT, my creator is ch1pset.`
+                    // + `If you are interested in speedrunning YL, I have some useful commands you may use to find resources.`
+                    // + `Use !help for a list of commands and how to use them.`
+                    // + `To keep spam out of the channels, I will reply spammy searches in a DM`);
+    });
 
     bot.on('disconnect', (e) =>
     {
@@ -60,26 +59,32 @@ function addBotListeners(bot)
 //Event listener for anytime a command is used. Output message gets sent to
 //proper channel here.
 input.on('cmd', (e) =>
+{
+    logger.info(`${e.data.username} used !${e.data.cmd}`);
+    try
     {
-        logger.info(`${e.data.username} used !${e.data.cmd}`);
-        try
-        {
-            sendToChannel(e.ch, e.data, e.out);
-        }
-        catch(e)
-        {
-            logger.error(e);
-        }
+        sendToChannel(e.ch, e.data, e.out);
     }
-);
+    catch(e)
+    {
+        logger.error(e);
+    }
+});
 
 process.on('uncaughtException', msg =>
-    {
-        logger.errToFile(msg);
+{
+    logger.errToFile(msg);
 
-        logger.errToConsole('Bot crashed. Check crash.log');
-    }
-);
+    logger.errToConsole('Bot crashed. Check crash.log');
+});
+
+process.on('exit', (code) =>
+{
+    if(code === 0)
+        logger.info(`Exited successfully`);
+    else
+        logger.error(`Exited with code ${code}`);
+});
 
 process.stdin.on('readable', () =>
 {
@@ -89,19 +94,22 @@ process.stdin.on('readable', () =>
         let cmd_in = /[\w]*\b([\w]*\b)/i.exec(chunk.toString());
         switch(cmd_in? cmd_in[0]:null)
         {
-            case 'init': initBot(auth.token); break;
             case 'restart':
-                killBot();
-                initBot(auth.token);
+            killBot();
+            initBot(auth.token);
             break;
-            case 'kill': killBot(); break;
+            case 'kill':
+            killBot();
+            break;
             case 'mem':
             process.stdout.write(`${JSON.stringify(process.memoryUsage(), null, 2)}`);
             break;
-            case 'exit': case 'quit': process.exit(0);
+            case 'exit': case 'quit':
+            killBot();
+            process.exit(0);
         }
     }
-})
+});
 
 function initBot(token)
 {
@@ -129,3 +137,6 @@ function sendToChannel(channel, data, output)
         case 'dm': data.usr.send(output); break;
     }
 }
+
+initBot(auth.token);
+logger.logToConsole(`Commands: restart, kill, mem, exit`);
