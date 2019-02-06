@@ -117,5 +117,18 @@
             "nopermit":"This command can only be used in permitted channels by members with permitted roles.",
             "noinput":"Please enter the name of the user, if you're quoting yourself, use `!quoteme` instead."
         }
+    },
+    "wr":{
+        "roles":["@everyone"],
+        "channels":["dm","text","group"],
+        "help":[
+            "```!wr category```",
+            "`!wr` will fetch the link to the world record of the specified category of YL.",
+            "Valid categories: `any`, `anywf`, `ab`, `100`, `100p`"
+        ],
+        "message":{
+            "nopermit":"Something went wrong. Maybe wrong channel?",
+            "notfound":"That category doesn't exist."
+        }
     }
 }
