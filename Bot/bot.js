@@ -11,6 +11,8 @@ const auth = require('./auth.json');
 // var bot = new Discord.Client();
 var input = new MessageParser();
 var client = {};
+let bSessionActive = false;
+let bKilled = false;
 
 function addBotListeners(bot)
 {
@@ -52,6 +54,8 @@ function addBotListeners(bot)
 
     bot.on('disconnect', (e) =>
     {
+        bSessionActive = false;
+        logger.info(e);
         logger.info(`Client has disconnected. Type \'restart\' to begin a new session.`);
     });
 }
@@ -96,7 +100,7 @@ process.stdin.on('readable', () =>
         {
             case 'restart':
             killBot();
-            initBot(auth.token);
+            initBot(auth.test_bot);
             break;
             case 'kill':
             killBot();
@@ -116,6 +120,8 @@ function initBot(token)
     client.bot = new Discord.Client();
     addBotListeners(client.bot);
     client.bot.login(token);
+    bSessionActive = true;
+    bKilled = false;
 }
 
 function killBot()
@@ -124,6 +130,7 @@ function killBot()
     {
         client.bot.destroy();
         logger.info(`Bot was destroyed`);
+        bKilled = true;
     }
 }
 
@@ -137,20 +144,20 @@ function sendToChannel(channel, data, output)
         case 'dm': data.usr.send(output); break;
     }
 }
-
-var bSessionActive = false;
 setInterval(() =>
 {
     try
     {
-        initBot(auth.token);
-        logger.logToConsole(`Commands: restart, kill, mem, exit`);
-        bSessionActive = true;
+        if(!bSessionActive && !bKilled)
+        {
+            initBot(auth.test_bot);
+            logger.logToConsole(`Commands: restart, kill, mem, exit`);
+        }
     }
     catch(e)
     {
         logger.error(e);
         logger.info(`Bot crashed, restarting bot...`);
-        initBot(auth.token);
+        initBot(auth.test_bot);
     }
 }, 500);
