@@ -11,13 +11,26 @@ module.exports = class CmdWR extends H.Command
         this.cat = args[0]?args[0].toLowerCase():'';
         this.ch = 'ch';
     }
-    exit(msg)
+    exit(msg, ch)
     {
-        return {ch:this.ch,msg:msg};
+        return {ch:ch?ch:this.ch,msg:msg};
     }
     execute()
     {
+        let option = arguments[0];
         let callback = arguments[2];
+        switch(option)
+        {
+            case 'catlist': case 'cl': case 'clist':
+            callback(this.catList());
+            break;
+            default:
+            this.getWR(callback);
+            break;
+        }
+    }
+    getWR(callback)
+    {
         let handleExceptions = (raw, res, rej) =>
         {
             try
@@ -30,7 +43,7 @@ module.exports = class CmdWR extends H.Command
                 rej('notfound');
             }
         }
-        let getWR = new Promise((resolve, reject) =>
+        let wr = new Promise((resolve, reject) =>
         {
             https.get(`${URL}/${this.findCat()}`, res =>
             {
@@ -42,6 +55,15 @@ module.exports = class CmdWR extends H.Command
         })
         .then(data => callback(this.exit(data)))
         .catch(e => callback(this.exit(this.message(e))));
+    }
+    catList()
+    {
+        let list = [];
+        for(let key in YL)
+        {
+            list.push(YL[key].join(', '));
+        }
+        return this.exit(list.join('\n'), 'dm');
     }
     findCat()
     {
