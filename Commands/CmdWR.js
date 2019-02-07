@@ -27,7 +27,7 @@ module.exports = class CmdWR extends H.Command
             catch(e)
             {
                 H.Logger.info(e);
-                rej('Not found');
+                rej('notfound');
             }
         }
         let getWR = new Promise((resolve, reject) =>
@@ -41,7 +41,7 @@ module.exports = class CmdWR extends H.Command
             });
         })
         .then(data => callback(this.exit(data)))
-        .catch(e => callback(this.exit(this.message('notfound'))));
+        .catch(e => callback(this.exit(this.message(e))));
     }
     findCat()
     {
