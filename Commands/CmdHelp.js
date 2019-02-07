@@ -29,7 +29,7 @@ module.exports = class CmdHelp extends H.Command
             let ch = this.cmd.channels.map(c => `\`${c}\``);
             let clist = H.Command.list().map(cmd => `\`!${cmd}\``);
 
-            out.push('This command works in:');
+            out.push('\nThis command works in:');
             out.push(`${ch.join(', ')} channels\n`);
             if(this.cmd.roles.length > 0)
             {
