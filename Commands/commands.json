@@ -124,7 +124,9 @@
         "help":[
             "```!wr category```",
             "`!wr` will fetch the link to the world record of the specified category of YL.",
-            "Valid categories: `any`, `anywf`, `ab`, `100`, `100p`"
+            "Valid categories include anything from <https://www.speedrun.com/yl>",
+            "**Options**",
+            "`!wrcatlist` or `!wrclist` or `!wrcl` will DM you a list of all category aliases."
         ],
         "message":{
             "nopermit":"Something went wrong. Maybe wrong channel?",
