@@ -138,5 +138,19 @@ function sendToChannel(channel, data, output)
     }
 }
 
-initBot(auth.token);
-logger.logToConsole(`Commands: restart, kill, mem, exit`);
+var bSessionActive = false;
+setInterval(() =>
+{
+    try
+    {
+        initBot(auth.token);
+        logger.logToConsole(`Commands: restart, kill, mem, exit`);
+        bSessionActive = true;
+    }
+    catch(e)
+    {
+        logger.error(e);
+        logger.info(`Bot crashed, restarting bot...`);
+        initBot(auth.token);
+    }
+}, 500);
