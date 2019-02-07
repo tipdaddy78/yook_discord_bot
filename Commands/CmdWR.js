@@ -8,7 +8,7 @@ module.exports = class CmdWR extends H.Command
     constructor(args)
     {
         super('wr');
-        this.cat = args[0]?args[0].toLowerCase():'';
+        this.arg = args[0]?args[0].toLowerCase():'';
         this.ch = 'ch';
     }
     exit(msg, ch)
@@ -22,7 +22,7 @@ module.exports = class CmdWR extends H.Command
         switch(option)
         {
             case 'catlist': case 'cl': case 'clist':
-            callback(this.catList());
+            this.catList(callback);
             break;
             default:
             this.getWR(callback);
@@ -56,20 +56,32 @@ module.exports = class CmdWR extends H.Command
         .then(data => callback(this.exit(data)))
         .catch(e => callback(this.exit(this.message(e))));
     }
-    catList()
+    catList(callback)
     {
-        let list = [];
-        for(let key in YL)
+        let list;
+        let key = this.findCat();
+        let all = () =>
         {
-            list.push(YL[key].join(', '));
+            let arr = [];
+            for(let key in YL)
+            {
+                arr.push(YL[key].join(', '));
+            }
+            return arr;
         }
-        return this.exit(list.join('\n'), 'dm');
+        list =  this.arg?
+                key?
+                YL[key].join(', ')
+                :''
+                :all();
+
+        callback(this.exit(list, 'dm'));
     }
     findCat()
     {
         for(let key in YL)
         {
-            let bool = YL[key].some(cat => cat === this.cat);
+            let bool = YL[key].includes(this.arg);
             if(bool) return key;
         }
         return '';
